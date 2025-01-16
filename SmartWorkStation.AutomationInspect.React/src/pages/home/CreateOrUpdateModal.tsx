@@ -1,0 +1,231 @@
+import {
+  Form,
+  Space,
+  Input,
+  InputNumber,
+  Radio,
+  Switch,
+  Divider,
+  Button,
+} from 'antd'
+import { Station, useStationStore } from '../../stores/stationStore'
+import { useContext, useState } from 'react'
+import { ModalContext } from '../../hooks/useModal'
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+
+type CreateOrUpdateModalProps = {
+  station?: Station
+  // onFinished?: (values: Station) => void
+}
+const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
+  const { stations } = useStationStore()
+
+  // get the max id of the stations and add 1
+  const initialStationId =
+    stations.reduce((max, station) => {
+      return station.id > max ? station.id : max
+    }, 0) + 1
+
+  const modalContext = useContext(ModalContext)
+
+  const initialValues = props.station || {
+    id: initialStationId,
+    name: '工作站' + initialStationId,
+    ip: '192.168.1.123',
+    port: 502,
+    adjust: true,
+    checkingCount: 10,
+    byDuration: true,
+    duration: 1,
+    times: 100,
+    targetTorque: 1.8,
+  }
+  const [byDuration, setByDuration] = useState(true)
+  const [form] = Form.useForm()
+  return (
+    <Form
+      form={form}
+      initialValues={initialValues}
+      onFinish={(values) => {
+        modalContext.onOk && modalContext.onOk(values)
+      }}
+    >
+      <Space className='w-full justify-between'>
+        <Form.Item<Station>
+          label='编号'
+          name='id'
+          rules={[{ required: true, message: '请输入正确的编号' }]}
+        >
+          <Input
+            style={{
+              width: '120px',
+            }}
+            disabled={!!props.station}
+          />
+        </Form.Item>
+        <Form.Item<Station>
+          label='名称'
+          name='name'
+          rules={[{ required: true, message: '请输入合适的名称' }]}
+        >
+          <Input style={{ width: '200px' }} />
+        </Form.Item>
+      </Space>
+      <Space className='w-full justify-between'>
+        <Form.Item<Station>
+          label='IP 地址'
+          name='ip'
+          rules={[{ required: true, message: '请输入正确的IP地址' }]}
+        >
+          <Input
+            style={{
+              width: '120px',
+            }}
+          />
+        </Form.Item>
+        <Form.Item<Station>
+          label='端口'
+          name='port'
+          rules={[{ required: true, message: '请输入端口' }]}
+        >
+          <InputNumber min={100} max={65535} />
+        </Form.Item>
+      </Space>
+
+      <Divider>点检</Divider>
+      <Form.List
+        name='checkingPoints'
+        rules={[
+          {
+            validator: async (_) => {
+              return Promise.resolve()
+            },
+          },
+        ]}
+      >
+        {(fields, { add, remove }, {}) => (
+          <>
+            <Space wrap>
+              {fields.map((field) => (
+                <Form.Item required={false} key={field.key}>
+                  <Space>
+                    <Form.Item
+                      {...field}
+                      validateTrigger={['onChange', 'onBlur']}
+                      rules={[
+                        {
+                          required: true,
+                          message: '请输入点检扭矩',
+                        },
+                      ]}
+                      noStyle
+                    >
+                      <InputNumber
+                        placeholder='扭矩'
+                        style={{ width: '90%' }}
+                      />
+                    </Form.Item>
+                  </Space>
+                  <span className='text-xs text-gray-400 mr-1'>N.m</span>
+                  {fields.length > 1 ? (
+                    <MinusCircleOutlined
+                      className='dynamic-delete-button'
+                      onClick={() => remove(field.name)}
+                    />
+                  ) : null}
+                </Form.Item>
+              ))}
+            </Space>
+            <Form.Item>
+              <Button
+                type='dashed'
+                onClick={() => add()}
+                style={{ width: '100%' }}
+                icon={<PlusOutlined />}
+              >
+                增加点检点
+              </Button>
+
+              {/* <Form.ErrorList errors={errors} /> */}
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+
+      <Space className='w-full justify-between'>
+        <Form.Item<Station> label='点检次数' name='checkingCount'>
+          <InputNumber min={10}></InputNumber>
+        </Form.Item>
+        <Form.Item<Station>
+          label='是否需要校验'
+          name='adjust'
+          valuePropName='checked'
+        >
+          <Switch></Switch>
+        </Form.Item>
+      </Space>
+
+      <Divider>老化</Divider>
+
+      <Space className='w-full justify-between'>
+        <Form.Item label='按照时间/次数' name={'byDuration'}>
+          <Radio.Group
+            defaultValue='true'
+            onChange={(e) => {
+              setByDuration(e.target.value)
+            }}
+          >
+            <Radio.Button value={true}>时间</Radio.Button>
+            <Radio.Button value={false}>次数</Radio.Button>
+          </Radio.Group>
+        </Form.Item>
+
+        {byDuration && (
+          <Form.Item<Station> label='持续时间' name='duration'>
+            <Space>
+              <InputNumber defaultValue={1} />
+              <span>小时</span>
+            </Space>
+          </Form.Item>
+        )}
+
+        {!byDuration && (
+          <Form.Item<Station> label='持续次数' name='times'>
+            <Space>
+              <InputNumber defaultValue={100} />
+              <span>次数</span>
+            </Space>
+          </Form.Item>
+        )}
+      </Space>
+      <Space className='justify-between w-full'>
+        <Form.Item<Station>
+          label='目标扭矩'
+          name='targetTorque'
+          rules={[{ required: true, message: '请输入合适的扭矩' }]}
+        >
+          <Space>
+            <InputNumber defaultValue={1.8} />
+            <span> N.m </span>
+          </Space>
+        </Form.Item>
+      </Space>
+
+      <Divider></Divider>
+      <Space className='w-full justify-end'>
+        <Button type='primary' htmlType='submit' className='ml-auto'>
+          保存
+        </Button>
+        <Button
+          onClick={() => {
+            modalContext.onCancel && modalContext.onCancel()
+          }}
+        >
+          取消
+        </Button>
+      </Space>
+    </Form>
+  )
+}
+
+export default CreateOrUpdateModal
