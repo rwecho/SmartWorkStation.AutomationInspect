@@ -93,7 +93,7 @@ const HomePage = () => {
             </Button>
             <Button
               size="small"
-              type="primary"
+              type="default"
               onClick={() => {
                 handleEdit(record)
               }}
@@ -192,7 +192,7 @@ const HomePage = () => {
           bordered={false}
           extra={
             <div>
-              <Button type="primary" onClick={handleAdd}>
+              <Button type="default" onClick={handleAdd}>
                 添加
               </Button>
             </div>
