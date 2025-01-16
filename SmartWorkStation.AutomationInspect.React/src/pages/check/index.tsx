@@ -1,8 +1,8 @@
-import { Layout, Space, theme } from 'antd'
-import { useStationStore } from '../../stores/stationStore'
-import StationCard from './StationCard'
-import { useEffect, useState } from 'react'
-import Check from './Check'
+import { Layout, Space, theme } from "antd"
+import { useStationStore } from "../../stores/stationStore"
+import StationCard from "./StationCard"
+import { useEffect, useState } from "react"
+import Check from "./Check"
 
 const CheckPage = () => {
   const { stations, load } = useStationStore()
@@ -11,21 +11,21 @@ const CheckPage = () => {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   const {
     token: { colorBgContainer },
   } = theme.useToken()
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Layout.Content
         style={{
           background: colorBgContainer,
         }}
-        className='mx-1 rounded-md p-4'
+        className="mx-1 rounded-md p-4"
       >
         {!selectedId && (
-          <div className='text-center text-2xl'>请选择工作站</div>
+          <div className="text-center text-2xl">请选择工作站</div>
         )}
 
         {selectedId && (
@@ -35,10 +35,10 @@ const CheckPage = () => {
       <Layout.Sider
         width={200}
         style={{ background: colorBgContainer }}
-        className='rounded-md p-4'
+        className="rounded-md p-4"
       >
         {/* Sidebar content */}
-        <Space direction='vertical' className='w-full'>
+        <Space direction="vertical" className="w-full">
           {stations.map((station) => (
             <StationCard
               key={station.id}

@@ -1,13 +1,19 @@
-import { create } from 'zustand'
+import { create } from "zustand"
+import { getAsync, postAsync, putAsync, removeAsync } from "../services/fetch"
 
 export interface Station {
   id: number
   name: string
   ip: string
   port: number
-  adjust: boolean
+  com: string
+  baudRate: number
+  dataBits: number
+  parity: number
+  stopBits: number
+  checking: boolean
   checkingPoints: number[]
-  checkingCount: number
+  checkingTimes: number
   byDuration: boolean
   duration: number
   times: number
@@ -20,27 +26,27 @@ interface StationStore {
   add: (station: Station) => Promise<void>
   remove: (id: number) => Promise<void>
   update: (station: Station) => Promise<void>
+  copy: (station: Station) => Promise<void>
 }
 
 export const useStationStore = create<StationStore>((set, get) => ({
   stations: [],
 
   load: async () => {
-    const json = localStorage.getItem('workstations')
-    if (json) {
-      set({ stations: JSON.parse(json) })
-    }
+    const stations = await getAsync<Station[]>("/api/stations")
+    set({ stations: stations })
   },
 
   add: async (station) => {
     const stations = get().stations
-
     if (stations.find((s: Station) => s.id === station.id)) {
-      throw new Error('工作站ID已存在')
+      throw new Error("工作站ID已存在")
     }
-
     stations.push(station)
-    localStorage.setItem('workstations', JSON.stringify(stations))
+    await postAsync("/api/stations", {
+      ...station,
+      dataBits: 8,
+    })
     set({ stations })
   },
 
@@ -48,7 +54,7 @@ export const useStationStore = create<StationStore>((set, get) => ({
     const stations = get().stations.filter(
       (station: Station) => station.id !== id
     )
-    localStorage.setItem('workstations', JSON.stringify(stations))
+    await removeAsync(`/api/stations/${id}`)
     set({ stations })
   },
 
@@ -56,7 +62,22 @@ export const useStationStore = create<StationStore>((set, get) => ({
     const stations = get().stations.map((s: Station) =>
       s.id === station.id ? station : s
     )
-    localStorage.setItem('workstations', JSON.stringify(stations))
+
+    await putAsync<Station>(`/api/stations/${station.id}`, station)
+    set({ stations })
+  },
+
+  copy: async (station) => {
+    const stations = get().stations
+
+    const newId =
+      stations.reduce((max, station) => {
+        return station.id > max ? station.id : max
+      }, 0) + 1
+
+    const newStation = { ...station, id: newId }
+    stations.push(newStation)
+    await postAsync("/api/stations", newStation)
     set({ stations })
   },
 }))

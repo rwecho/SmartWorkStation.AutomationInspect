@@ -1,4 +1,6 @@
-﻿namespace SmartWorkStation.AutomationInspect.App.Services;
+﻿using System.IO.Ports;
+
+namespace SmartWorkStation.AutomationInspect.App.Services;
 
 /// <summary>
 /// 工作站
@@ -26,6 +28,31 @@ public class Station
     public required int Port { get; set; }
 
     /// <summary>
+    /// 扭力测量仪 COM口
+    /// </summary>
+    public required string Com { get; set; }
+
+    /// <summary>
+    /// 扭力测量仪波特率
+    /// </summary>
+    public required int BaudRate { get; set; }
+
+    /// <summary>
+    /// 扭力测量仪数据位
+    /// </summary>
+    public required int DataBits { get; set; }
+
+    /// <summary>
+    /// 扭力测量仪校验位
+    /// </summary>
+    public required byte Parity { get; set; }
+
+    /// <summary>
+    /// 扭力测量仪停止位
+    /// </summary>
+    public required byte StopBits { get; set; }
+
+    /// <summary>
     /// 是否点检
     /// </summary>
     public bool Checking { get; set; } = true;
@@ -33,7 +60,7 @@ public class Station
     /// <summary>
     /// 点检点，每个点代表一个力矩
     /// </summary>
-    public int[] CheckingPoint { get; set; } = [];
+    public int[] CheckingPoints { get; set; } = [];
 
     /// <summary>
     /// 每个点检点的检测次数

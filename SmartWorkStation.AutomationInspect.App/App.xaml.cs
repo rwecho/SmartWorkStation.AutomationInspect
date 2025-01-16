@@ -35,7 +35,7 @@ namespace SmartWorkStation.AutomationInspect.App
 
             await builder.AddApplicationAsync<AppModule>();
             var app= builder.Build();
-            app.InitializeApplication();
+            await app.InitializeApplicationAsync();
             _app = app;
             await _app.RunAsync();
         }

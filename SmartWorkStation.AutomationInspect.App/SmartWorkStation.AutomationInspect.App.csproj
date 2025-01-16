@@ -39,6 +39,7 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -66,6 +67,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
+        <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="Volo.Abp.AspNetCore" Version="9.0.3" />
         <PackageReference Include="Volo.Abp.Autofac" Version="9.0.3" />
         <PackageReference Include="Volo.Abp.Swashbuckle" Version="9.0.3" />
@@ -78,5 +80,10 @@
 	<ItemGroup>
 		<None Remove="appsettings.json" />
 		<EmbeddedResource Include="appsettings.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\SmartWorkstation\sdks\SmartWorkStation.LibATF6000\src\SmartWorkStation.LibATF6000\SmartWorkstation.LibATF6000.csproj" />
+	  <ProjectReference Include="..\..\SmartWorkstation\sdks\SmartWorkStation.LibTorqueMeter\src\SmartWorkStation.LibTorqueMeter\SmartWorkStation.LibTorqueMeter.csproj" />
 	</ItemGroup>
 </Project>

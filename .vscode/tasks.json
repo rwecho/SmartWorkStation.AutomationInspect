@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build2app",
+      "path": "SmartWorkStation.AutomationInspect.React",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build2app - SmartWorkStation.AutomationInspect.React",
+      "detail": "pnpm build && pnpm move"
+    }
+  ]
+}
