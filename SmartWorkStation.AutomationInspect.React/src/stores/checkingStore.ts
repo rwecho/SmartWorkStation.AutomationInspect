@@ -1,48 +1,50 @@
 import { create } from 'zustand'
 
-interface Checking {
-  id: number
-  status: 'pending' | 'checking' | 'done' | 'error'
-  merterTorques: number[]
-  screwTorques: number[]
-  start: (id: number) => Promise<void>
-  done: () => Promise<void>
-  error: () => Promise<void>
+export enum CheckingStatus {
+  idle,
+  checking,
+  calibrated,
+  aging,
+  finished,
+  error,
 }
 
-export const useStationCheckingStore = create<Checking>((set) => ({
-  id: 0,
-  status: 'pending',
+export interface PointItem {
+  Point: number
+  Index: number
+  ScrewTorque: number
+  MeterTorque: number
+}
 
-  merterTorques: [],
-  screwTorques: [],
+export interface AgingItem {
+  Index: number
+  ScrewTorque: number
+  MeterTorque: number
+}
 
-  start: async (id: number) => {
-    set({ id, status: 'checking' })
+interface Checking {
+  status: CheckingStatus
+  pointItems: PointItem[]
+  agingItems: AgingItem[]
 
-    // 每隔1秒象meterTorques和screwTorques添加一条数据
-    setInterval(() => {
-      set((state) => {
-        return {
-          ...state,
-          merterTorques: [
-            ...state.merterTorques,
-            Math.floor(Math.random() * 100),
-          ],
-          screwTorques: [
-            ...state.screwTorques,
-            Math.floor(Math.random() * 100),
-          ],
-        }
-      })
-    }, 1000)
+  setStatus: (status: CheckingStatus) => void
+  addPointItem: (pointItem: PointItem) => void
+  addAgingItem: (agingItem: AgingItem) => void
+}
+
+export const useCheckingStore = create<Checking>((set) => ({
+  status: CheckingStatus.idle,
+  setStatus: (status) => set({ status }),
+  pointItems: [],
+  addPointItem: (pointItem) => {
+    if (pointItem) {
+      set((state) => ({ pointItems: [...state.pointItems, pointItem] }))
+    }
   },
-
-  done: async () => {
-    set({ id: 0, status: 'done' })
-  },
-
-  error: async () => {
-    set({ id: 0, status: 'error' })
+  agingItems: [],
+  addAgingItem: (agingItem) => {
+    if (agingItem) {
+      set((state) => ({ agingItems: [...state.agingItems, agingItem] }))
+    }
   },
 }))

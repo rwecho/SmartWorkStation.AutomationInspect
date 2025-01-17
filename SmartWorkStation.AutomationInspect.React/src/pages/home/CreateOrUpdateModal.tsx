@@ -8,11 +8,11 @@ import {
   Divider,
   Button,
   Select,
-} from "antd"
-import { Station, useStationStore } from "../../stores/stationStore"
-import { useContext, useState } from "react"
-import { ModalContext } from "../../hooks/useModal"
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons"
+} from 'antd'
+import { Station, useStationStore } from '../../stores/stationStore'
+import { useContext, useState } from 'react'
+import { ModalContext } from '../../hooks/useModal'
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
 type CreateOrUpdateModalProps = {
   station?: Station
@@ -31,10 +31,10 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
 
   const initialValues = props.station || {
     id: initialStationId,
-    name: "工作站" + initialStationId,
-    ip: "192.168.1.123",
+    name: '工作站' + initialStationId,
+    ip: '192.168.1.123',
     port: 502,
-    com: "COM3",
+    com: 'COM3',
     baudRate: 19200,
     dataBits: 8,
     parity: 1,
@@ -42,7 +42,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
     checking: true,
     checkingTimes: 10,
     byDuration: true,
-    duration: 1,
+    duration: 60,
     times: 100,
     targetTorque: 1.8,
   }
@@ -56,63 +56,63 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         if (modalContext.onOk) modalContext.onOk(values)
       }}
     >
-      <Space className="w-full justify-between">
+      <Space className='w-full justify-between'>
         <Form.Item<Station>
-          label="编号"
-          name="id"
-          rules={[{ required: true, message: "请输入正确的编号" }]}
+          label='编号'
+          name='id'
+          rules={[{ required: true, message: '请输入正确的编号' }]}
         >
           <Input
             style={{
-              width: "120px",
+              width: '120px',
             }}
             disabled={!!props.station}
           />
         </Form.Item>
         <Form.Item<Station>
-          label="名称"
-          name="name"
-          rules={[{ required: true, message: "请输入合适的名称" }]}
+          label='名称'
+          name='name'
+          rules={[{ required: true, message: '请输入合适的名称' }]}
         >
-          <Input style={{ width: "200px" }} />
+          <Input style={{ width: '200px' }} />
         </Form.Item>
       </Space>
-      <Space className="w-full justify-between">
+      <Space className='w-full justify-between'>
         <Form.Item<Station>
-          label="IP 地址"
-          name="ip"
-          rules={[{ required: true, message: "请输入正确的IP地址" }]}
+          label='IP 地址'
+          name='ip'
+          rules={[{ required: true, message: '请输入正确的IP地址' }]}
         >
           <Input
             style={{
-              width: "120px",
+              width: '120px',
             }}
           />
         </Form.Item>
         <Form.Item<Station>
-          label="端口"
-          name="port"
-          rules={[{ required: true, message: "请输入端口" }]}
+          label='端口'
+          name='port'
+          rules={[{ required: true, message: '请输入端口' }]}
         >
           <InputNumber min={100} max={65535} />
         </Form.Item>
       </Space>
-      <Space className="w-full" wrap>
+      <Space className='w-full' wrap>
         <Form.Item<Station>
-          label="COM"
-          name="com"
-          rules={[{ required: true, message: "请输入正确的COM" }]}
+          label='COM'
+          name='com'
+          rules={[{ required: true, message: '请输入正确的COM' }]}
         >
           <Input
             style={{
-              width: "120px",
+              width: '120px',
             }}
           />
         </Form.Item>
         <Form.Item<Station>
-          label="波特率"
-          name="baudRate"
-          rules={[{ required: true, message: "请选择波特率" }]}
+          label='波特率'
+          name='baudRate'
+          rules={[{ required: true, message: '请选择波特率' }]}
         >
           <Select defaultValue={19200}>
             <Select.Option value={9600}>9600</Select.Option>
@@ -125,9 +125,9 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
 
         <Form.Item<Station>
-          label="校验位"
-          name="parity"
-          rules={[{ required: true, message: "请选择校验位" }]}
+          label='校验位'
+          name='parity'
+          rules={[{ required: true, message: '请选择校验位' }]}
         >
           <Select defaultValue={1}>
             <Select.Option value={0}>None</Select.Option>
@@ -139,9 +139,9 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
 
         <Form.Item<Station>
-          label="停止位"
-          name="stopBits"
-          rules={[{ required: true, message: "请选择停止位" }]}
+          label='停止位'
+          name='stopBits'
+          rules={[{ required: true, message: '请选择停止位' }]}
         >
           <Select defaultValue={0}>
             <Select.Option value={0}>None</Select.Option>
@@ -152,10 +152,10 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
 
         <Form.Item<Station>
-          label="数据位"
-          name="dataBits"
+          label='数据位'
+          name='dataBits'
           hidden
-          rules={[{ required: true, message: "请填写数据位" }]}
+          rules={[{ required: true, message: '请填写数据位' }]}
         >
           <InputNumber min={5} max={8} />
         </Form.Item>
@@ -163,7 +163,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
 
       <Divider>点检</Divider>
       <Form.List
-        name="checkingPoints"
+        name='checkingPoints'
         rules={[
           {
             validator: async () => {
@@ -180,25 +180,25 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
                   <Space>
                     <Form.Item
                       {...field}
-                      validateTrigger={["onChange", "onBlur"]}
+                      validateTrigger={['onChange', 'onBlur']}
                       rules={[
                         {
                           required: true,
-                          message: "请输入点检扭矩",
+                          message: '请输入点检扭矩',
                         },
                       ]}
                       noStyle
                     >
                       <InputNumber
-                        placeholder="扭矩"
-                        style={{ width: "90%" }}
+                        placeholder='扭矩'
+                        style={{ width: '90%' }}
                       />
                     </Form.Item>
                   </Space>
-                  <span className="text-xs text-gray-400 mr-1">N.m</span>
+                  <span className='text-xs text-gray-400 mr-1'>N.m</span>
                   {fields.length > 1 ? (
                     <MinusCircleOutlined
-                      className="dynamic-delete-button"
+                      className='dynamic-delete-button'
                       onClick={() => remove(field.name)}
                     />
                   ) : null}
@@ -207,9 +207,9 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
             </Space>
             <Form.Item>
               <Button
-                type="dashed"
+                type='dashed'
                 onClick={() => add()}
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 icon={<PlusOutlined />}
               >
                 增加点检点
@@ -221,14 +221,14 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         )}
       </Form.List>
 
-      <Space className="w-full justify-between">
-        <Form.Item<Station> label="点检次数" name="checkingTimes">
+      <Space className='w-full justify-between'>
+        <Form.Item<Station> label='点检次数' name='checkingTimes'>
           <InputNumber min={10}></InputNumber>
         </Form.Item>
         <Form.Item<Station>
-          label="是否需要校验"
-          name="checking"
-          valuePropName="checked"
+          label='是否需要校验'
+          name='checking'
+          valuePropName='checked'
         >
           <Switch></Switch>
         </Form.Item>
@@ -236,10 +236,10 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
 
       <Divider>老化</Divider>
 
-      <Space className="w-full justify-between">
-        <Form.Item label="按照时间/次数" name={"byDuration"}>
+      <Space className='w-full justify-between'>
+        <Form.Item label='按照时间/次数' name={'byDuration'}>
           <Radio.Group
-            defaultValue="true"
+            defaultValue='true'
             onChange={(e) => {
               setByDuration(e.target.value)
             }}
@@ -250,16 +250,16 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
 
         {byDuration && (
-          <Form.Item<Station> label="持续时间" name="duration">
+          <Form.Item<Station> label='持续时间' name='duration'>
             <Space>
-              <InputNumber defaultValue={1} />
+              <InputNumber defaultValue={60} />
               <span>分钟</span>
             </Space>
           </Form.Item>
         )}
 
         {!byDuration && (
-          <Form.Item<Station> label="持续次数" name="times">
+          <Form.Item<Station> label='持续次数' name='times'>
             <Space>
               <InputNumber defaultValue={100} />
               <span>次数</span>
@@ -267,11 +267,11 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
           </Form.Item>
         )}
       </Space>
-      <Space className="justify-between w-full">
+      <Space className='justify-between w-full'>
         <Form.Item<Station>
-          label="目标扭矩"
-          name="targetTorque"
-          rules={[{ required: true, message: "请输入合适的扭矩" }]}
+          label='目标扭矩'
+          name='targetTorque'
+          rules={[{ required: true, message: '请输入合适的扭矩' }]}
         >
           <Space>
             <InputNumber defaultValue={1.8} />
@@ -281,8 +281,8 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
       </Space>
 
       <Divider></Divider>
-      <Space className="w-full justify-end">
-        <Button type="primary" htmlType="submit" className="ml-auto">
+      <Space className='w-full justify-end'>
+        <Button type='primary' htmlType='submit' className='ml-auto'>
           保存
         </Button>
         <Button

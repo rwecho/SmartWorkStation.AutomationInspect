@@ -25,5 +25,10 @@ public enum CheckingStatus
     /// <summary>
     /// 测试完成
     /// </summary>
-    Finished
+    Finished,
+
+    /// <summary>
+    /// 出错
+    /// </summary>
+    Error
 }

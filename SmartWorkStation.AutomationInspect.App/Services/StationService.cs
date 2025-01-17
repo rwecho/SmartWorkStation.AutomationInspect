@@ -3,6 +3,42 @@ using Volo.Abp.DependencyInjection;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
 
+public class CheckingReport
+{
+    public required int Id { get; set; }
+    public required DateTime StartTime { get; set; }
+    public required DateTime EndTime { get; set; }
+    public required string Name { get; set; }
+    public double Kp { get; set; }
+    public double B { get; set; }
+    public required List<CheckPointData> PointData { get; set; }
+    public required List<AgingData> AgingData { get; set; }
+}
+public class CheckingService : ITransientDependency
+{
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    public async Task CreateReportAsync(CheckingReport report)
+    {
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppData", "checkings", $"{report.Id}.{report.StartTime:yyyyMMddHHmmss}.json");
+        var directory = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory!);
+        }
+
+        try
+        {
+            await _semaphore.WaitAsync();
+            var json = JsonSerializer.Serialize(report);
+            await File.WriteAllTextAsync(filePath, json);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+}
+
 
 public class StationService : ITransientDependency
 {

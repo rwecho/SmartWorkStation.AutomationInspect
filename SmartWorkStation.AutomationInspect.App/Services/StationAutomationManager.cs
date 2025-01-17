@@ -9,6 +9,8 @@ public class StationAutomationManager(StationService stationService,
 {
     private readonly ConcurrentDictionary<int, StationConnection> _connections = new();
 
+    private readonly ConcurrentDictionary<int, CheckingTask> _checkingTasks = new();
+
     public async Task StartAsync()
     {
         stationService.OnAdd += OnStationAdd;
@@ -21,11 +23,18 @@ public class StationAutomationManager(StationService stationService,
             _connections.TryAdd(station.Id,
                 new StationConnection(station, serviceProvider.GetRequiredService<ILogger<StationConnection>>()));
         }
+        foreach (var connection in _connections.Values)
+        {
+            await connection.StartAsync();
+        }
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
-        return Task.CompletedTask;
+        foreach (var connection in _connections.Values)
+        {
+            await connection.StopAsync();
+        }
     }
 
     public StationConnection GetStationConnection(int id)
@@ -44,12 +53,14 @@ public class StationAutomationManager(StationService stationService,
     {
         var connection = new StationConnection(station,
             serviceProvider.GetRequiredService<ILogger<StationConnection>>());
-        _connections.TryAdd(station.Id, connection);
+        if (_connections.TryAdd(station.Id, connection))
+            connection.StartAsync();
     }
 
     private void OnStationRemove(Station station)
     {
-        _connections.TryRemove(station.Id, out var connection);
+        if (_connections.TryRemove(station.Id, out var connection))
+            connection.StopAsync();
     }
 
     private void OnStationUpdate(Station station)
@@ -57,4 +68,30 @@ public class StationAutomationManager(StationService stationService,
         OnStationRemove(station);
         OnStationAdd(station);
     }
+
+    public Task StartChecking(int id)
+    {
+        var connection = GetStationConnection(id);
+        var cts = new CancellationTokenSource();
+        var task = Task.Run(() => connection.Checking(cts.Token), cts.Token);
+        _checkingTasks.TryAdd(id, new CheckingTask(task, cts));
+        return Task.CompletedTask;
+    }
+
+    public async Task CancelChecking(int id)
+    {
+        if (_checkingTasks.TryRemove(id, out var checkingTask))
+        {
+            if (!checkingTask.Cts.IsCancellationRequested)
+            {
+                checkingTask.Cts.Cancel();
+            }
+            if (!checkingTask.Task.IsCompleted)
+            {
+                await checkingTask.Task;
+            }
+        }
+    }
+
+    private record CheckingTask(Task Task, CancellationTokenSource Cts);
 }
