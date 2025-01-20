@@ -60,7 +60,7 @@ public class Station
     /// <summary>
     /// 点检点，每个点代表一个力矩
     /// </summary>
-    public int[] CheckingPoints { get; set; } = [];
+    public double[] CheckingPoints { get; set; } = [];
 
     /// <summary>
     /// 每个点检点的检测次数

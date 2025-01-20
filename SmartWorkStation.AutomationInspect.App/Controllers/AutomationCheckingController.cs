@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartWorkStation.AutomationInspect.App.Services;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.Json;
 using Volo.Abp;
@@ -166,6 +167,7 @@ public class AutomationCheckingController(StationAutomationManager automationMan
 
     private async Task StreamObservableAsync<T>(IObservable<T> observable, CancellationToken token)
     {
+        Response.Clear();
         Response.ContentType = "text/event-stream";
         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         token.Register(() => tcs.TrySetCanceled(token));
@@ -187,6 +189,10 @@ public class AutomationCheckingController(StationAutomationManager automationMan
         try
         {
             await tcs.Task;
+        }
+        catch(TaskCanceledException)
+        {
+            // ignored
         }
         finally
         {

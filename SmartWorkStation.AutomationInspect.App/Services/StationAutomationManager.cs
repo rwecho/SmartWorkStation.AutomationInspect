@@ -20,8 +20,8 @@ public class StationAutomationManager(StationService stationService,
         var stations = await stationService.GetListAsync();
         foreach (var station in stations)
         {
-            _connections.TryAdd(station.Id,
-                new StationConnection(station, serviceProvider.GetRequiredService<ILogger<StationConnection>>()));
+            var connection = ActivatorUtilities.CreateInstance<StationConnection>(serviceProvider, station);
+            _connections.TryAdd(station.Id, connection);
         }
         foreach (var connection in _connections.Values)
         {
@@ -51,8 +51,7 @@ public class StationAutomationManager(StationService stationService,
 
     private void OnStationAdd(Station station)
     {
-        var connection = new StationConnection(station,
-            serviceProvider.GetRequiredService<ILogger<StationConnection>>());
+        var connection = ActivatorUtilities.CreateInstance<StationConnection>(serviceProvider, station);
         if (_connections.TryAdd(station.Id, connection))
             connection.StartAsync();
     }

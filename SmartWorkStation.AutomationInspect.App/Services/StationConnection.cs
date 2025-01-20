@@ -1,14 +1,16 @@
 ﻿using MathNet.Numerics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Animations;
 using SmartWorkStation.LibATF6000;
 using SmartWorkStation.LibTorqueMeter;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
 
-public class StationConnection(Station station, CheckingService checkingService,ILogger<StationConnection> logger)
+public class StationConnection(Station station, CheckingService checkingService, ILogger<StationConnection> logger)
 {
     private readonly ATF6000Client _atf6000Client = new(station.IP, station.Port);
 
@@ -49,13 +51,12 @@ public class StationConnection(Station station, CheckingService checkingService,
                 token.ThrowIfCancellationRequested();
 
                 // 切换电批目标扭矩。
-                logger.LogInformation("切换电批目标扭矩 {Point}", point);
                 await SwitchTargetTorque(point);
 
                 for (int i = 0; i < station.CheckingTimes; i++)
                 {
                     token.ThrowIfCancellationRequested();
-                    logger.LogInformation("运行点检 {Point} {Count}", point, i + 1);
+                    logger.LogInformation("运行点检 {Point:F2}N.m 第{Count}次", point, i + 1);
                     var item = await AutoRun(token);
                     var checkPointData = new CheckPointData(
                         point, i,
@@ -70,10 +71,19 @@ public class StationConnection(Station station, CheckingService checkingService,
             logger.LogInformation("点检完成");
             _checkPointSteam.OnCompleted();
 
+            double kp = 0;
+            double b = 0;
             // 开始调整电批系数
-            var (kp, b) = Calibrate(checkPointList);
-            logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
-            await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
+            if (checkPointList.Count != 0)
+            {
+                (kp, b) = Calibrate(checkPointList);
+                logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
+                await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
+            }
+            else
+            {
+                logger.LogInformation("未获取到点检数据，跳过校准电批系数");
+            }
             _checkingStatusStream.OnNext(Services.CheckingStatus.Calibrated);
 
             token.ThrowIfCancellationRequested();
@@ -87,17 +97,18 @@ public class StationConnection(Station station, CheckingService checkingService,
                 var startTime = DateTime.Now;
                 int count = 0;
 
-                logger.LogInformation("开始老化测试，持续时间{Duration}小时", station.Duration);
+                logger.LogInformation("开始老化测试，持续时间{Duration}分钟", station.Duration);
                 while (DateTime.Now - startTime < TimeSpan.FromMinutes(station.Duration))
                 {
                     token.ThrowIfCancellationRequested();
-                    logger.LogInformation("运行老化测试 {Count}", count);
+                    logger.LogInformation("运行老化测试 第{Count}次", count);
                     var item = await AutoRun(token);
                     var data = new AgingData(count, item.Item1?.Torque, item.Item2);
                     logger.LogInformation("老化测试数据 {Data}", data);
                     _agingDataStream.OnNext(data);
                     agingDataList.Add(data);
                     count++;
+                    logger.LogInformation("剩余时间 {Time}", TimeSpan.FromMinutes(station.Duration) - (DateTime.Now - startTime));
                 }
             }
             else
@@ -106,7 +117,7 @@ public class StationConnection(Station station, CheckingService checkingService,
                 for (int i = 0; i < station.Times; i++)
                 {
                     token.ThrowIfCancellationRequested();
-                    logger.LogInformation("运行老化测试 {Count}", i + 1);
+                    logger.LogInformation("运行老化测试 第{Count}/{TotalTimes}次", i + 1, station.Times);
                     var item = await AutoRun(token);
                     var data = new AgingData(i, item.Item1?.Torque, item.Item2);
                     logger.LogInformation("老化测试数据 {Data}", data);
@@ -114,6 +125,7 @@ public class StationConnection(Station station, CheckingService checkingService,
                     agingDataList.Add(data);
                 }
             }
+            logger.LogInformation($"老化测试完成");
             _agingDataStream.OnCompleted();
             _checkingStatusStream.OnNext(Services.CheckingStatus.Finished);
 
@@ -131,7 +143,7 @@ public class StationConnection(Station station, CheckingService checkingService,
             logger.LogInformation("生成报告 {Report}", checkReport);
             await checkingService.CreateReportAsync(checkReport);
         }
-        catch (TaskCanceledException exception)
+        catch (TaskCanceledException)
         {
             _checkingStatusStream.OnNext(Services.CheckingStatus.Idle);
             logger.LogInformation("点检任务取消");
@@ -145,21 +157,24 @@ public class StationConnection(Station station, CheckingService checkingService,
 
     public async Task<(RealRecord?, double?)> AutoRun(CancellationToken cancellationToken)
     {
+        var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        cancellationToken.Register(() => timeoutCts.Cancel());
         var tsc = new TaskCompletionSource<(RealRecord?, double?)>();
+        await ResetMeter();
         using var disposed = _atf6000Client.RealRecordStream
-             .Delay(TimeSpan.FromSeconds(0.2))
+             .Delay(TimeSpan.FromSeconds(0.5))
              .WithLatestFrom(_torqueMeterClient.ValueStream)
              .Do((item) =>
              {
-                 if (tsc.Task.IsCompleted) return;
+                 var (record, value) = item;
                  tsc.SetResult(item);
+                 logger.LogInformation("获取到电批数据 {Record} ,{Value}", record?.Torque, value);
              })
              .Subscribe();
         await StartScrewing(3.5, cancellationToken);
         await StartReverseScrewing(2.5, cancellationToken);
-        var result = await tsc.Task;
-        await ResetMeter();
-        return result;
+        timeoutCts.Token.Register(() => tsc.TrySetCanceled());
+        return await tsc.Task;
     }
 
     private static (double kp, double b) Calibrate(List<CheckPointData> checkPointList)
@@ -221,14 +236,14 @@ public class StationConnection(Station station, CheckingService checkingService,
         await _atf6000Client.Unlock();
     }
 
-    private async Task SwitchTargetTorque(int torque)
+    private async Task SwitchTargetTorque(double torque)
     {
         short pSet = 0;
         //获取程序号0的配置
         var config = await _atf6000Client.GetPSetConfig(pSet);
         // 设置扭矩
         config.Step1.Torque = (short)(torque * 100);
-        logger.LogInformation("切换电批目标扭矩 {Torque}", torque);
+        logger.LogInformation("切换电批目标扭矩 {Torque:F2}", torque);
         await _atf6000Client.SetPSetConfig(pSet, config);
         // 切换程序号0
         await _atf6000Client.ChangePSet(pSet);

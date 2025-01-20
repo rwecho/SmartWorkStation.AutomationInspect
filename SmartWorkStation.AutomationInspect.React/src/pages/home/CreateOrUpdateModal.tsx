@@ -46,7 +46,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
     times: 100,
     targetTorque: 1.8,
   }
-  const [byDuration, setByDuration] = useState(true)
+  const [byDuration, setByDuration] = useState(initialValues.byDuration)
   const [form] = Form.useForm()
   return (
     <Form
@@ -223,7 +223,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
 
       <Space className='w-full justify-between'>
         <Form.Item<Station> label='点检次数' name='checkingTimes'>
-          <InputNumber min={10}></InputNumber>
+          <InputNumber></InputNumber>
         </Form.Item>
         <Form.Item<Station>
           label='是否需要校验'
@@ -250,33 +250,24 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
 
         {byDuration && (
-          <Form.Item<Station> label='持续时间' name='duration'>
-            <Space>
-              <InputNumber defaultValue={60} />
-              <span>分钟</span>
-            </Space>
+          <Form.Item<Station> label='持续时间(分钟)' name='duration'>
+            <InputNumber defaultValue={30} />
           </Form.Item>
         )}
 
         {!byDuration && (
-          <Form.Item<Station> label='持续次数' name='times'>
-            <Space>
-              <InputNumber defaultValue={100} />
-              <span>次数</span>
-            </Space>
+          <Form.Item<Station> label='持续次数(次数)' name='times'>
+            <InputNumber defaultValue={10} />
           </Form.Item>
         )}
       </Space>
-      <Space className='justify-between w-full'>
+      <Space>
         <Form.Item<Station>
-          label='目标扭矩'
+          label='目标扭矩(N.m)'
           name='targetTorque'
           rules={[{ required: true, message: '请输入合适的扭矩' }]}
         >
-          <Space>
-            <InputNumber defaultValue={1.8} />
-            <span> N.m </span>
-          </Space>
+          <InputNumber />
         </Form.Item>
       </Space>
 

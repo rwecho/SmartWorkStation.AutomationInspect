@@ -15,6 +15,7 @@ public static class MauiProgram
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
+        Log.Logger.Information("====================Starting application====================");
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -26,6 +27,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
+        builder.Services.AddSerilog(Log.Logger);
         builder.Services.AddTransient<HybridWebViewTarget>();
         builder.Services.AddMauiBlazorWebView();
 

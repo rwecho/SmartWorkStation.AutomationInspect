@@ -42,7 +42,7 @@ public class StationsController(StationService stationService) : AbpController
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id}")]   
     public async Task<ActionResult<Station>> Update(int id, [FromBody] Station updatedStation)
     {
         if (await stationService.GetAsync(id) == null)

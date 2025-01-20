@@ -61,6 +61,7 @@
     </ItemGroup>
 
 
+
     <ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
@@ -68,6 +69,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="Volo.Abp.AspNetCore" Version="9.0.3" />
         <PackageReference Include="Volo.Abp.Autofac" Version="9.0.3" />
@@ -76,11 +79,6 @@
 		<PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
-    </ItemGroup>
-
-	<ItemGroup>
-		<None Remove="appsettings.json" />
-		<EmbeddedResource Include="appsettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>

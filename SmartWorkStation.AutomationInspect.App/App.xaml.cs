@@ -5,18 +5,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using Volo.Abp;
+using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace SmartWorkStation.AutomationInspect.App
 {
     public partial class App : Application
     {
-        public App(IServiceProvider serviceProvider)
+        public App(IServiceProvider serviceProvider, ILogger<App> logger)
         {
             InitializeComponent();
             ServiceProvider = serviceProvider;
             _createTask = Task.Factory.StartNew(CreateApp);
+            _logger = logger;
         }
-
+        private readonly ILogger<App> _logger;
         private readonly Task _createTask;
         private IHost? _app;
 
@@ -25,18 +28,19 @@ namespace SmartWorkStation.AutomationInspect.App
             var configuration = ServiceProvider.GetRequiredService<IConfiguration>();
             var builder = WebApplication.CreateBuilder();
             builder.Host.AddAppSettingsSecretsJson()
-                .UseAutofac();
-
+                .UseAutofac()
+                .UseSerilog();
+            var port = configuration.GetValue<int?>("API:Port") ?? 82;
             builder.WebHost.ConfigureKestrel(options =>
             {
-                var port = configuration.GetValue<int?>("API:Port") ?? 82;
                 options.Listen(IPAddress.Any, port);
             });
 
             await builder.AddApplicationAsync<AppModule>();
-            var app= builder.Build();
+            var app = builder.Build();
             await app.InitializeApplicationAsync();
             _app = app;
+            _logger.LogInformation($"启动API服务, 监听端口 {port}");
             await _app.RunAsync();
         }
 
@@ -53,8 +57,9 @@ namespace SmartWorkStation.AutomationInspect.App
                 var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(id);
                 appWindow.Closing += async (s, e) =>
                 {
-                    if(_app != null)
+                    if (_app != null)
                     {
+                        Log.Logger.Information("=====================Closing application===================");
                         await _app.StopAsync();
                         await _createTask;
                     }

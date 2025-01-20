@@ -18,6 +18,7 @@ const Pending = () => {
   }
   const handleStart = async () => {
     try {
+      debugger
       await startChecking(station.id)
       message.success('开始点检成功')
     } catch (e) {

@@ -108,6 +108,7 @@ export const putAsync = async <T>(
   data: object
 ): Promise<T | undefined> => {
   const apiUrl = combineUrls(API_ENDPOINT, url)
+
   const response = await fetch(apiUrl, {
     method: 'PUT',
     headers: {
