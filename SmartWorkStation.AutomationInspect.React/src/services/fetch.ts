@@ -20,7 +20,7 @@ export const getAsync = async <T>(
   defaultValue: T | undefined = undefined
 ): Promise<T | undefined> => {
   const apiUrl = combineUrls(API_ENDPOINT, url)
-  const response = await fetch(apiUrl)
+  const response = await fetch(apiUrl, {})
   const contentType = response.headers.get('content-type')
   if (response.ok) {
     // check if the response is a json

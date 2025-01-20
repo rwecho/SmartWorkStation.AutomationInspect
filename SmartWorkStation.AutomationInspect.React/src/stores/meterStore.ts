@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 
-interface MeterInfo {
-  Model: number
-  SerialNumber: string
-  DateOfProduct: string
-  MaxWarn: string
-  MinWarn: string
-  Version: string
-  Unitorder: number
-  Peek: number
+export interface MeterInfo {
+  model: number
+  serialNumber: string
+  dateOfProduct: string
+  maxWarn: string
+  minWarn: string
+  version: string
+  unitorder: number
+  peek: number
 }
 
 interface Meter {

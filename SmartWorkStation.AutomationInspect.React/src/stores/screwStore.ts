@@ -1,20 +1,20 @@
 import { create } from 'zustand'
 
-interface ScrewStatus {
-  ProcedureNumber: number
-  Torque: number
-  RPM: number
-  Angle: number
-  Status: number
-  Pset: number
-  LockFlag: number
-  Temperature: number
-  Time: Date
-  DriveSerialNumber: number
-  MachineSerialNumber: number
-  ControlBy485: number
-  StartFlag: number
-  ScrewDirection: number
+export interface ScrewStatus {
+  procedureNumber: number
+  torque: number
+  rpm: number
+  angle: number
+  status: number
+  pset: number
+  lockFlag: number
+  temperature: number
+  time: Date
+  driveSerialNumber: number
+  machineSerialNumber: number
+  controlBy485: number
+  startFlag: number
+  screwDirection: number
 }
 
 interface Screw {

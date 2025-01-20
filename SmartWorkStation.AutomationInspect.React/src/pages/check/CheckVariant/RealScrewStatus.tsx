@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import './RealScrewStatus.css'
 import { useScrewStore } from '../../../stores/screwStore'
 import {
+  getScrewStatus,
   lock,
   reverseScrewing,
   screwing,
@@ -46,18 +47,16 @@ const RealScrewStatus = ({
   const { screwStatus, setScrewStatus } = useScrewStore()
 
   useEffect(() => {
-    setScrewStatus(undefined)
-    const url = `/api/checking/${id}/screw-status`
-    const eventSource = new EventSource(fullifyUrl(url))
-    eventSource.onmessage = (event) => {
-      setScrewStatus(JSON.parse(event.data))
-    }
-    eventSource.onerror = () => {
-      debugger
-      message.error('无法连接到电批')
-    }
+    const interval = setInterval(async () => {
+      try {
+        const screwStatus = await getScrewStatus(id)
+        setScrewStatus(screwStatus)
+      } catch (error) {
+        message.error('无法连接到螺丝机')
+      }
+    }, 1000)
     return () => {
-      eventSource.close()
+      clearInterval(interval)
     }
   }, [id, setScrewStatus])
 
@@ -118,24 +117,24 @@ const RealScrewStatus = ({
             <tbody>
               <tr>
                 <td>程序号</td>
-                <td>{screwStatus.Pset}</td>
+                <td>{screwStatus.pset}</td>
 
                 <td>扭矩</td>
                 <td>
-                  {screwStatus.Torque / 100.0}
+                  {screwStatus.torque / 100.0}
                   <span className='text-sm text-gray-400'>N.M</span>
                 </td>
 
                 <td>转速</td>
                 <td>
-                  {screwStatus.RPM}{' '}
+                  {screwStatus.rpm}{' '}
                   <span className='text-sm text-gray-400'>rpm</span>
                 </td>
 
                 <td>锁定标志</td>
                 <td>
                   <Tag color='orange'>
-                    {screwStatus.LockFlag === 1 ? '锁定' : '未锁定'}
+                    {screwStatus.lockFlag === 1 ? '锁定' : '未锁定'}
                   </Tag>
                 </td>
               </tr>
@@ -143,34 +142,34 @@ const RealScrewStatus = ({
               <tr>
                 <td>角度</td>
                 <td>
-                  {screwStatus.Angle}
+                  {screwStatus.angle}
                   <span className='text-sm text-gray-400'>°</span>
                 </td>
 
                 <td>状态</td>
-                <td>{parseStatus(screwStatus.Status)}</td>
+                <td>{parseStatus(screwStatus.status)}</td>
 
                 <td>过程号</td>
-                <td>{screwStatus.ProcedureNumber}</td>
+                <td>{screwStatus.procedureNumber}</td>
               </tr>
               <tr>
                 <td>温度</td>
                 <td>
-                  {screwStatus.Temperature}
+                  {screwStatus.temperature}
                   <span className='text-sm text-gray-400'>℃</span>
                 </td>
 
                 <td>时间</td>
-                <td>{screwStatus.Time.toLocaleString()}</td>
+                <td>{screwStatus.time.toLocaleString()}</td>
 
                 <td>序列号</td>
-                <td>{screwStatus.MachineSerialNumber}</td>
+                <td>{screwStatus.machineSerialNumber}</td>
               </tr>
               <tr>
                 <td>启动信号</td>
-                <td>{screwStatus.StartFlag}</td>
+                <td>{screwStatus.startFlag}</td>
                 <td>启动方向</td>
-                <td>{screwStatus.ScrewDirection === 1 ? '反转' : '正转'}</td>
+                <td>{screwStatus.screwDirection === 1 ? '反转' : '正转'}</td>
               </tr>
             </tbody>
           </table>
@@ -192,14 +191,14 @@ const RealScrewStatus = ({
               <Button
                 size='large'
                 onClick={() => {
-                  if (screwStatus.LockFlag === 1) {
+                  if (screwStatus.lockFlag === 1) {
                     handleUnlock()
                   } else {
                     handleLock()
                   }
                 }}
               >
-                {screwStatus.LockFlag === 1 ? '解锁' : '锁定'}
+                {screwStatus.lockFlag === 1 ? '解锁' : '锁定'}
               </Button>
             </Space>
           )}

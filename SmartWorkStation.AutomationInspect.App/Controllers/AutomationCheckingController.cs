@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartWorkStation.AutomationInspect.App.Services;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.Json;
 using Volo.Abp;
@@ -12,88 +11,6 @@ namespace SmartWorkStation.AutomationInspect.App.Controllers;
 [Route("/api/checking")]
 public class AutomationCheckingController(StationAutomationManager automationManager) : AbpController
 {
-    [HttpGet("{id}/screw-status")]
-    public async Task GetScrewStatus(int id, CancellationToken token)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await StreamObservableAsync(stationConnection.ScrewStatus, token);
-    }
-
-
-    [HttpPost("{id}/screwing")]
-    public async Task StartScrewing(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        //await stationConnection.StartScrewing(3.5, default);
-        await stationConnection.AutoRun(default);
-    }
-
-    [HttpPost("{id}/reverse-screwing")]
-    public async Task StartReverseScrewing(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.StartReverseScrewing(2.5, default);
-    }
-
-    [HttpPost("{id}/sync-time")]
-    public async Task SyncTime(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.SyncTime();
-    }
-
-    [HttpPost("{id}/lock")]
-    public async Task Lock(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.Lock();
-    }
-
-
-    [HttpPost("{id}/unlock")]
-    public async Task Unlock(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.Unlock();
-    }
-
-
-
-    [HttpGet("{id}/meter/value")]
-    public async Task GetMeterValue(int id, CancellationToken token)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await StreamObservableAsync(stationConnection.MeterRealValue, token);
-    }
-
-    [HttpGet("{id}/meter/info")]
-    public async Task GetMeterInfo(int id, CancellationToken token)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await StreamObservableAsync(stationConnection.MeterRealInfo, token);
-    }
-
-    [HttpPost("{id}/meter/peek")]
-    public async Task SwitchPeek(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.SwitchPeek();
-    }
-
-    [HttpPost("{id}/meter/unit")]
-    public async Task SwitchUnit(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.SwitchUnit();
-    }
-
-    [HttpPost("{id}/meter/reset")]
-    public async Task ResetMeter(int id)
-    {
-        var stationConnection = automationManager.GetStationConnection(id);
-        await stationConnection.ResetMeter();
-    }
-
     [HttpGet("{id}/status")]
     public async Task GetStatusAsync(int id, CancellationToken token)
     {
@@ -101,7 +18,6 @@ public class AutomationCheckingController(StationAutomationManager automationMan
         var statusObservable = stationConnection.CheckingStatus.Select(status => (byte)status);
         await StreamObservableAsync(statusObservable, token);
     }
-
 
     [HttpPost("{id}/start")]
     public async Task<IActionResult> StartChecking(int id, CancellationToken token)
@@ -146,8 +62,8 @@ public class AutomationCheckingController(StationAutomationManager automationMan
         var (kp, b) = await stationConnection.GetFactor();
         return this.Json(new
         {
-            kp = kp,
-            b = b
+            kp,
+            b
         });
     }
 

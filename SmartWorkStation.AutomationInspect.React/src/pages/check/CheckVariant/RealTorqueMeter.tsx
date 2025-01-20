@@ -1,7 +1,13 @@
 import { Button, Card, Space, message } from 'antd'
 import { useEffect } from 'react'
 import { useMeterStore } from '../../../stores/meterStore'
-import { reset, togglePeek, toggleUnit } from '../../../services/meter'
+import {
+  getInfo,
+  getValue,
+  reset,
+  togglePeek,
+  toggleUnit,
+} from '../../../services/meter'
 import { fullifyUrl } from '../../../services/fetch'
 
 const parseUnit = (unit: number) => {
@@ -38,36 +44,30 @@ const RealTorqueMeter = ({
   const { info, value, setValue, setInfo } = useMeterStore()
 
   useEffect(() => {
-    setValue(undefined)
-
-    const eventSource = new EventSource(
-      fullifyUrl(`/api/checking/${id}/meter/value`)
-    )
-    eventSource.onmessage = (event) => {
-      setValue(parseFloat(event.data))
-    }
-    eventSource.onerror = () => {
-      console.log('无法连接到扭力测量仪')
-    }
-
+    const interval = setInterval(async () => {
+      try {
+        const value = await getValue(id)
+        setValue(value)
+      } catch (error) {
+        message.error('无法连接到扭力测量仪')
+      }
+    }, 1000)
     return () => {
-      eventSource.close()
+      clearInterval(interval)
     }
   }, [id, setValue])
 
   useEffect(() => {
-    setInfo(undefined)
-    const eventSource = new EventSource(
-      fullifyUrl(`api/checking/${id}/meter/info`)
-    )
-    eventSource.onmessage = (event) => {
-      setInfo(JSON.parse(event.data))
-    }
-    eventSource.onerror = () => {
-      message.error('无法连接到扭力测量仪')
-    }
+    const interval = setInterval(async () => {
+      try {
+        const info = await getInfo(id)
+        setInfo(info)
+      } catch (error) {
+        message.error('无法连接到扭力测量仪')
+      }
+    }, 1000)
     return () => {
-      eventSource.close()
+      clearInterval(interval)
     }
   }, [id, setInfo])
 
@@ -106,13 +106,13 @@ const RealTorqueMeter = ({
             <tbody>
               <tr>
                 <td>型号</td>
-                <td>{info.Model}</td>
+                <td>{info.model}</td>
 
                 <td>单位</td>
-                <td>{parseUnit(info.Unitorder)}</td>
+                <td>{parseUnit(info.unitorder)}</td>
 
                 <td>模式</td>
-                <td>{parsePeek(info.Peek)}</td>
+                <td>{parsePeek(info.peek)}</td>
 
                 <td>力矩</td>
                 <td>{value}</td>
