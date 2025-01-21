@@ -60,6 +60,11 @@
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Remove="Assets\logo.ico" />
+      <Content Remove="Assets\logo.png" />
+    </ItemGroup>
+
 
 
     <ItemGroup>
@@ -84,5 +89,20 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\SmartWorkstation\sdks\SmartWorkStation.LibATF6000\src\SmartWorkStation.LibATF6000\SmartWorkstation.LibATF6000.csproj" />
 	  <ProjectReference Include="..\..\SmartWorkstation\sdks\SmartWorkStation.LibTorqueMeter\src\SmartWorkStation.LibTorqueMeter\SmartWorkStation.LibTorqueMeter.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Assets\logo.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\logo.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="ChineseSimplified.isl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="setup.iss">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>
