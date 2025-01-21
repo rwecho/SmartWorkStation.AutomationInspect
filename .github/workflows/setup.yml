@@ -65,9 +65,10 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}/publish/$env:Configuration
+          ls
           mkdir output
           iscc.exe setup.iss
-          ls  ${{ github.workspace }}/publish/$env:Configuration/output
+          ls  ${{ github.workspace }}/publish/$env:Configuration/output/
           echo $env:VERSION
           cd output
           mv 斧工自动测试工作台.setup.x64.exe 斧工自动测试工作台.setup.x64-$env:VERSION.exe
