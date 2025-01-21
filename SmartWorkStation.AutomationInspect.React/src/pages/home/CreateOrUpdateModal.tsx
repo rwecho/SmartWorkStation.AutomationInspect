@@ -161,7 +161,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
         </Form.Item>
       </Space>
 
-      <Divider>点检</Divider>
+      <Divider>校验</Divider>
       <Form.List
         name='checkingPoints'
         rules={[
@@ -184,7 +184,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
                       rules={[
                         {
                           required: true,
-                          message: '请输入点检扭矩',
+                          message: '请输入校验扭矩',
                         },
                       ]}
                       noStyle
@@ -212,7 +212,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
                 style={{ width: '100%' }}
                 icon={<PlusOutlined />}
               >
-                增加点检点
+                增加校验点
               </Button>
 
               {/* <Form.ErrorList errors={errors} /> */}
@@ -222,7 +222,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
       </Form.List>
 
       <Space className='w-full justify-between'>
-        <Form.Item<Station> label='点检次数' name='checkingTimes'>
+        <Form.Item<Station> label='校验次数' name='checkingTimes'>
           <InputNumber></InputNumber>
         </Form.Item>
         <Form.Item<Station>

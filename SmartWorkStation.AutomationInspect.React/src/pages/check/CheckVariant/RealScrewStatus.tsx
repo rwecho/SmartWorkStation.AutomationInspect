@@ -122,7 +122,7 @@ const RealScrewStatus = ({
                 <td>扭矩</td>
                 <td>
                   {screwStatus.torque / 100.0}
-                  <span className='text-sm text-gray-400'>N.M</span>
+                  <span className='text-sm text-gray-400'> N.m</span>
                 </td>
 
                 <td>转速</td>
@@ -166,10 +166,19 @@ const RealScrewStatus = ({
                 <td>{screwStatus.machineSerialNumber}</td>
               </tr>
               <tr>
-                <td>启动信号</td>
-                <td>{screwStatus.startFlag}</td>
-                <td>启动方向</td>
-                <td>{screwStatus.screwDirection === 1 ? '反转' : '正转'}</td>
+                <td>启动</td>
+                <td>
+                  {screwStatus.startFlag === 1 ? (
+                    <Tag color='green'>启动</Tag>
+                  ) : (
+                    <Tag color='red'>停止</Tag>
+                  )}
+                  {screwStatus.screwDirection === 1 ? (
+                    <Tag color='red'>反转</Tag>
+                  ) : (
+                    <Tag color='green'>正转</Tag>
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>

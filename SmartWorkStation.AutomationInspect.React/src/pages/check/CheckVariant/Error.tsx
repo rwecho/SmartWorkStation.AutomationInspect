@@ -1,17 +1,34 @@
-import { Button } from 'antd'
+import { Alert, Breadcrumb, Button, Space } from 'antd'
 import { finishChecking } from '../../../services/checking'
+import RealScrewStatus from './RealScrewStatus'
+import RealTorqueMeter from './RealTorqueMeter'
+import { useContext } from 'react'
+import { StationContext } from '../../../hooks/useStationContext'
+import useCheckStatus from '../../../hooks/useCheckStatus'
 
 const Error = () => {
+  const { station } = useContext(StationContext)
+  if (!station) {
+    return <div>未选择工作站</div>
+  }
+  const { error } = useCheckStatus(station.id)
   const handleReset = () => {
     finishChecking(1)
   }
   return (
-    <>
-      error
-      <Button onClick={handleReset} type='primary'>
-        复位
-      </Button>
-    </>
+    <Space direction='vertical' className='w-full'>
+      <Breadcrumb>
+        <Breadcrumb.Item>{station.name}</Breadcrumb.Item>
+      </Breadcrumb>
+      <div className='flex justify-center my-8'>
+        <Alert message={error} type='error' showIcon></Alert>
+        <Button size='large' danger onClick={handleReset} className='w-64 h-16'>
+          复位
+        </Button>
+      </div>
+      <RealScrewStatus id={station.id} readonly={false}></RealScrewStatus>
+      <RealTorqueMeter id={station.id} readonly={false}></RealTorqueMeter>
+    </Space>
   )
 }
 

@@ -18,16 +18,15 @@ const Pending = () => {
   }
   const handleStart = async () => {
     try {
-      debugger
       await startChecking(station.id)
-      message.success('开始点检成功')
+      message.success('开始校验成功')
     } catch (e) {
-      message.error('开始点检失败')
+      message.error('开始校验失败')
     }
   }
 
   return (
-    <Space direction='vertical' className=' w-full'>
+    <Space direction='vertical' className='w-full'>
       <Breadcrumb>
         <Breadcrumb.Item>{station.name}</Breadcrumb.Item>
       </Breadcrumb>

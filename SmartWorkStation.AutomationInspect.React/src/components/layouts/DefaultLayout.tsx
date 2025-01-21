@@ -51,7 +51,7 @@ const DefaultLayout = () => {
               {
                 key: '2',
                 icon: <CheckCircleOutlined />,
-                label: '点检',
+                label: '校验',
                 onClick: () => {
                   navigate('/check')
                 },

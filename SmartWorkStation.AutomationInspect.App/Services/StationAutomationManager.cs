@@ -71,6 +71,12 @@ public class StationAutomationManager(StationService stationService,
     public Task StartChecking(int id)
     {
         var connection = GetStationConnection(id);
+
+        if (!connection.IsIdle)
+        {
+            throw new InvalidOperationException("工作站正在工作中，请稍后再试。");
+        }
+
         var cts = new CancellationTokenSource();
         var task = Task.Run(() => connection.Checking(cts.Token), cts.Token);
         _checkingTasks.TryAdd(id, new CheckingTask(task, cts));
@@ -85,10 +91,7 @@ public class StationAutomationManager(StationService stationService,
             {
                 checkingTask.Cts.Cancel();
             }
-            if (!checkingTask.Task.IsCompleted)
-            {
-                await checkingTask.Task;
-            }
+            await checkingTask.Task;
         }
     }
 

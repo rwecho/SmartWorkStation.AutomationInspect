@@ -16,7 +16,7 @@ const StationCard = ({
         {station.ip}:{station.port}
       </Tag>
       <Tag color='cyan'>扭矩: {station.targetTorque} N.m</Tag>
-      {station.adjust && <Tag color='success'>自动校验</Tag>}
+      {station.checking && <Tag color='success'>自动校验</Tag>}
       {station.byDuration && <Tag color='orange'>{station.duration} 小时</Tag>}
     </Space>
   )

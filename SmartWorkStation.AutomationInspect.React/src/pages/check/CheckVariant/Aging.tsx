@@ -1,8 +1,18 @@
 import { Card, Table } from 'antd'
-import { useCheckingStore } from '../../../stores/checkingStore'
+import useCheckStatus from '../../../hooks/useCheckStatus'
+import { useContext } from 'react'
+import { StationContext } from '../../../hooks/useStationContext'
 
 const Aging = () => {
-  const { agingItems } = useCheckingStore()
+  var { station } = useContext(StationContext)
+  if (!station)
+    return (
+      <Card>
+        <h1>请选择一个工位</h1>
+      </Card>
+    )
+  const { agingPoints } = useCheckStatus(station.id)
+  console.log(agingPoints)
 
   const columns = [
     {
@@ -14,6 +24,9 @@ const Aging = () => {
       title: '电批扭矩',
       dataIndex: 'ScrewTorque',
       key: 'screwTorque',
+      render: (torque: number) => {
+        return (torque / 100.0).toFixed(2)
+      },
     },
     {
       title: '测量仪扭矩',
@@ -25,7 +38,7 @@ const Aging = () => {
     <Card>
       <Table
         columns={columns}
-        dataSource={agingItems}
+        dataSource={agingPoints}
         pagination={{
           pageSize: 10,
         }}

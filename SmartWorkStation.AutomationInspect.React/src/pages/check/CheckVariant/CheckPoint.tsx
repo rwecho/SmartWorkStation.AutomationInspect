@@ -1,15 +1,18 @@
 import { Card, Table } from 'antd'
-import { useCheckingStore } from '../../../stores/checkingStore'
+import useCheckStatus from '../../../hooks/useCheckStatus'
+import { useContext } from 'react'
+import { StationContext } from '../../../hooks/useStationContext'
 
 const CheckPoint = () => {
-  const { pointItems } = useCheckingStore()
+  const { station } = useContext(StationContext)
+
+  if (!station) {
+    return <div>未选择工作站</div>
+  }
+
+  const { checkingPoints } = useCheckStatus(station.id)
 
   const columns = [
-    {
-      title: '序号',
-      dataIndex: 'Index',
-      key: 'index',
-    },
     {
       title: '点测扭矩',
       dataIndex: 'Point',
@@ -30,7 +33,7 @@ const CheckPoint = () => {
     <Card>
       <Table
         columns={columns}
-        dataSource={pointItems}
+        dataSource={checkingPoints}
         pagination={{
           pageSize: 10,
         }}

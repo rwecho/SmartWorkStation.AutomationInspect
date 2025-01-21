@@ -32,6 +32,9 @@ public class StationConnection(Station station, CheckingService checkingService,
     private readonly BehaviorSubject<AgingData?> _agingDataStream = new(null);
     public IObservable<AgingData?> AgingStream => _agingDataStream;
 
+    public string? Error { get; private set; }
+
+    public bool IsIdle => _checkingStatusStream.Value == Services.CheckingStatus.Idle;
 
     public async Task Checking(CancellationToken token)
     {
@@ -150,6 +153,7 @@ public class StationConnection(Station station, CheckingService checkingService,
         }
         catch (Exception exception)
         {
+            Error = exception.Message;
             _checkingStatusStream.OnNext(Services.CheckingStatus.Error);
             logger.LogError(exception, "点检任务异常");
         }

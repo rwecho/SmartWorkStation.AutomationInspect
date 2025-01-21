@@ -30,5 +30,10 @@ public enum CheckingStatus
     /// <summary>
     /// 出错
     /// </summary>
-    Error
+    Error,
+
+    /// <summary>
+    /// 取消
+    /// </summary>
+    Canceled
 }

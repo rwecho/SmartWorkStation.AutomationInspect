@@ -1,12 +1,13 @@
 import { create } from 'zustand'
+import { fullifyUrl } from '../services/fetch'
 
 export enum CheckingStatus {
-  idle,
-  checking,
-  calibrated,
-  aging,
-  finished,
-  error,
+  idle = 0,
+  checking = 1,
+  calibrated = 2,
+  aging = 3,
+  finished = 4,
+  error = 5,
 }
 
 export interface PointItem {
@@ -24,27 +25,8 @@ export interface AgingItem {
 
 interface Checking {
   status: CheckingStatus
-  pointItems: PointItem[]
-  agingItems: AgingItem[]
-
-  setStatus: (status: CheckingStatus) => void
-  addPointItem: (pointItem: PointItem) => void
-  addAgingItem: (agingItem: AgingItem) => void
 }
 
 export const useCheckingStore = create<Checking>((set) => ({
   status: CheckingStatus.idle,
-  setStatus: (status) => set({ status }),
-  pointItems: [],
-  addPointItem: (pointItem) => {
-    if (pointItem) {
-      set((state) => ({ pointItems: [...state.pointItems, pointItem] }))
-    }
-  },
-  agingItems: [],
-  addAgingItem: (agingItem) => {
-    if (agingItem) {
-      set((state) => ({ agingItems: [...state.agingItems, agingItem] }))
-    }
-  },
 }))
