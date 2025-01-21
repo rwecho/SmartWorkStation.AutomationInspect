@@ -4,30 +4,29 @@ import RealScrewStatus from './RealScrewStatus'
 import RealTorqueMeter from './RealTorqueMeter'
 import { useContext } from 'react'
 import { StationContext } from '../../../hooks/useStationContext'
-import useCheckStatus from '../../../hooks/useCheckStatus'
 
-const Finished = () => {
+const Canceled = () => {
   const { station } = useContext(StationContext)
   if (!station) {
     return <div>未选择工作站</div>
   }
-  const { error } = useCheckStatus(station.id)
   const handleReset = async () => {
     try {
       await finishChecking(station.id)
       message.info('复位成功')
-    } catch (error) {}
-    message.error('复位失败')
+    } catch (error) {
+      message.error('复位失败')
+    }
   }
   return (
     <Space direction='vertical' className='w-full'>
       <Breadcrumb>
         <Breadcrumb.Item>{station.name}</Breadcrumb.Item>
       </Breadcrumb>
-      <Alert message='校验已完成' type='success' showIcon></Alert>
+
+      <Alert message='校验已取消' type='warning' showIcon></Alert>
 
       <div className='flex justify-center my-8'>
-        <Alert message={error} type='error' showIcon></Alert>
         <Button size='large' danger onClick={handleReset} className='w-64 h-16'>
           复位
         </Button>
@@ -38,4 +37,4 @@ const Finished = () => {
   )
 }
 
-export default Finished
+export default Canceled

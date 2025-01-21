@@ -15,12 +15,12 @@ const CheckPoint = () => {
   const columns = [
     {
       title: '点测扭矩(N.m)',
-      dataIndex: 'Point',
+      dataIndex: 'point',
       key: 'point',
     },
     {
       title: '电批扭矩(N.m)',
-      dataIndex: 'ScrewTorque',
+      dataIndex: 'screwTorque',
       key: 'screwTorque',
       render: (torque: number) => {
         return (torque / 100.0).toFixed(2)
@@ -28,7 +28,7 @@ const CheckPoint = () => {
     },
     {
       title: '测量仪扭矩(N.m)',
-      dataIndex: 'MeterTorque',
+      dataIndex: 'meterTorque',
       key: 'meterTorque',
     },
   ]

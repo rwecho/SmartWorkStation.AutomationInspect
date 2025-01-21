@@ -53,7 +53,10 @@ public class AutomationCheckingController(StationAutomationManager automationMan
                             {
                                 if (item == null) return;
 
-                                var json = JsonSerializer.Serialize(item);
+                                var json = JsonSerializer.Serialize(item, new JsonSerializerOptions
+                                {
+                                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                                });
                                 await Response.WriteAsync($"event: checking\n");
                                 await Response.WriteAsync($"data: {json}\n\n");
                             }))
@@ -67,6 +70,9 @@ public class AutomationCheckingController(StationAutomationManager automationMan
                             {
                                 kp,
                                 b
+                            }, new JsonSerializerOptions
+                            {
+                                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                             });
                             await Response.WriteAsync($"event: calibrated\n");
                             await Response.WriteAsync($"data: {json}\n\n");
@@ -79,7 +85,10 @@ public class AutomationCheckingController(StationAutomationManager automationMan
                                 {
                                     if (item == null) return;
 
-                                    var json = JsonSerializer.Serialize(item);
+                                    var json = JsonSerializer.Serialize(item, new JsonSerializerOptions
+                                    {
+                                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                                    });
                                     await Response.WriteAsync($"event: aging\n");
                                     await Response.WriteAsync($"data: {json}\n\n");
                                 }))

@@ -75,26 +75,22 @@ const ReactChart = () => {
 
   const { realTorque } = useCheckStatus(station.id)
 
-  let count = 0
   useEffect(() => {
     const newOption = cloneDeep(option) // immutable
     const data0 = newOption.series[0].data
     const data1 = newOption.series[1].data
+    const axisData = newOption.xAxis[0].data
     if (!realTorque) return
+    const { screwTorque, meterTorque } = realTorque
     if (data0.length > 20) {
       data0.shift()
-    }
-    const { screwTorque, meterTorque } = realTorque
-
-    data0.push(screwTorque as never)
-
-    if (data1.length > 20) {
       data1.shift()
+      axisData.shift()
     }
-    data1.push(meterTorque as never)
-
-    newOption.xAxis[0].data.shift()
-    newOption.xAxis[0].data.push(count++ as never)
+    const x = data0.length + 1
+    data0.push(meterTorque as never)
+    data1.push((screwTorque / 100.0) as never)
+    axisData.push(x as never)
 
     setOption(newOption)
   }, [realTorque])

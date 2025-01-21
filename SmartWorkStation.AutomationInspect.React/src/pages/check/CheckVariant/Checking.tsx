@@ -8,6 +8,7 @@ import { CheckingStatus } from '../../../stores/checkingStore'
 import Aging from './Aging'
 import CheckPoint from './CheckPoint'
 import useCheckStatus from '../../../hooks/useCheckStatus'
+import Chart from './Chart'
 
 const CheckingChart = () => {
   const { station } = useContext(StationContext)
@@ -18,7 +19,6 @@ const CheckingChart = () => {
 
   const handleCancel = async () => {
     try {
-      debugger
       await cancelChecking(station.id)
       message.info('停止成功')
     } catch {
@@ -31,6 +31,7 @@ const CheckingChart = () => {
 
   return (
     <Space direction='vertical' size='large' className='w-full '>
+      <Chart></Chart>
       <Space size={'large'} className='w-full justify-center my-8'>
         {screwFactor && (
           <>
@@ -65,7 +66,6 @@ const CheckingChart = () => {
           </Button>
         </Popconfirm>
       </Space>
-
       <RealScrewStatus id={station.id} readonly></RealScrewStatus>
       <RealTorqueMeter id={station.id} readonly></RealTorqueMeter>
     </Space>

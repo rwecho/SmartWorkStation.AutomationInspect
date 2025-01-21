@@ -1,4 +1,4 @@
-import { Alert, Breadcrumb, Button, Space } from 'antd'
+import { Alert, Breadcrumb, Button, Space, message } from 'antd'
 import { finishChecking } from '../../../services/checking'
 import RealScrewStatus from './RealScrewStatus'
 import RealTorqueMeter from './RealTorqueMeter'
@@ -12,8 +12,14 @@ const Error = () => {
     return <div>未选择工作站</div>
   }
   const { error } = useCheckStatus(station.id)
-  const handleReset = () => {
-    finishChecking(1)
+  const handleReset = async () => {
+    try {
+      await finishChecking(station.id)
+
+      message.info('复位成功')
+    } catch (error) {
+      message.error('复位失败')
+    }
   }
   return (
     <Space direction='vertical' className='w-full'>

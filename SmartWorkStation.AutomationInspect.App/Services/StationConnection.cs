@@ -51,6 +51,7 @@ public class StationConnection(Station station, CheckingService checkingService,
             // 开始点检
             foreach (var point in station.CheckingPoints)
             {
+                Trace.WriteLine($"点检 {point}N.m");
                 token.ThrowIfCancellationRequested();
 
                 // 切换电批目标扭矩。
@@ -58,6 +59,7 @@ public class StationConnection(Station station, CheckingService checkingService,
 
                 for (int i = 0; i < station.CheckingTimes; i++)
                 {
+                    Trace.WriteLine($"运行点检 {point}N.m 第{i + 1}次");
                     token.ThrowIfCancellationRequested();
                     logger.LogInformation("运行点检 {Point:F2}N.m 第{Count}次", point, i + 1);
                     var item = await AutoRun(token);
@@ -66,6 +68,7 @@ public class StationConnection(Station station, CheckingService checkingService,
                         item.Item1?.Torque,
                         item.Item2
                     );
+                    Trace.WriteLine($"点检数据 {checkPointData}");
                     _checkPointSteam.OnNext(checkPointData);
                     checkPointList.Add(checkPointData);
                 }
@@ -175,8 +178,11 @@ public class StationConnection(Station station, CheckingService checkingService,
                  logger.LogInformation("获取到电批数据 {Record} ,{Value}", record?.Torque, value);
              })
              .Subscribe();
+        Trace.WriteLine("开始自动运行");
         await StartScrewing(station.ScrewingWaitTime, cancellationToken);
+        Trace.WriteLine("开始等待");
         await StartReverseScrewing(station.ReverseScrewingWaitTime, cancellationToken);
+        Trace.WriteLine("等待完成");
         timeoutCts.Token.Register(() => tsc.TrySetCanceled());
         return await tsc.Task;
     }
@@ -187,7 +193,7 @@ public class StationConnection(Station station, CheckingService checkingService,
         var points = group.Select(o => o.Key).ToArray();
         var torques = group.Select(o => o.Where(t => t.ScrewTorque != null).Select(p => p.ScrewTorque).Average())
             .Where(t => t != null)
-            .Select(t => t!.Value)
+            .Select(t => t!.Value/100.0)
             .ToArray();
         // 计算电批系数, 以points为x轴，torques为y轴, 用线性回归计算出kp 斜率和b 截距 ，MathNet.Numerics
         var (b, kp) = Fit.Line([.. points.Select(p => (double)p)], [.. torques]);
@@ -256,6 +262,7 @@ public class StationConnection(Station station, CheckingService checkingService,
     public void Finish()
     {
         if (_checkingStatusStream.Value == Services.CheckingStatus.Finished ||
+            _checkingStatusStream.Value == Services.CheckingStatus.Canceled||
           _checkingStatusStream.Value == Services.CheckingStatus.Error)
         {
             _checkingStatusStream.OnNext(Services.CheckingStatus.Idle);

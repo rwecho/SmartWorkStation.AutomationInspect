@@ -17,12 +17,12 @@ const Aging = () => {
   const columns = [
     {
       title: '序号',
-      dataIndex: 'Index',
+      dataIndex: 'index',
       key: 'index',
     },
     {
       title: '电批扭矩',
-      dataIndex: 'ScrewTorque',
+      dataIndex: 'screwTorque',
       key: 'screwTorque',
       render: (torque: number) => {
         return (torque / 100.0).toFixed(2)
@@ -30,7 +30,7 @@ const Aging = () => {
     },
     {
       title: '测量仪扭矩',
-      dataIndex: 'MeterTorque',
+      dataIndex: 'meterTorque',
       key: 'meterTorque',
     },
   ]

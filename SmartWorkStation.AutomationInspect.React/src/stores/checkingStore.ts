@@ -7,6 +7,7 @@ export enum CheckingStatus {
   aging = 3,
   finished = 4,
   error = 5,
+  canceled = 6,
 }
 
 export interface PointItem {
