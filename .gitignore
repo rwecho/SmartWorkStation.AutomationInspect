@@ -361,7 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-SmartWorkStation.AutomationInspect.App/Resources/Raw/wwwroot/index.html
-SmartWorkStation.AutomationInspect.App/Resources/Raw/wwwroot/vite.svg
-SmartWorkStation.AutomationInspect.App/Resources/Raw/wwwroot/assets/index-Bpzqjoo-.css
-SmartWorkStation.AutomationInspect.App/Resources/Raw/wwwroot/assets/index-YYtl8QzX.js
+
