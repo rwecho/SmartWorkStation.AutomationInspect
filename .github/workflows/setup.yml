@@ -1,0 +1,137 @@
+name: .NET Core Desktop
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release]
+
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+      product: ${{ steps.get_version.outputs.PRODUCT }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      #   # git submodules
+      #   - name: Update submodules
+      #     run: git submodule update --init --recursive
+
+      # Install the .NET Core workload
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Prepare release version
+        id: get_version
+        shell: pwsh
+        run: |
+          $TAG=$env:GITHUB_REF_NAME
+          $TEMP=$(echo $TAG | sed -e 's/^v//')
+          echo $TEMP
+
+          # Split the temp into version and product which is separated by '-'
+          $VERSION=$(echo $TEMP | cut -d '-' -f 1)
+          $PRODUCT=$(echo $TEMP | cut -d '-' -f 2)
+          echo "VERSION=$VERSION" >> $env:GITHUB_OUTPUT
+          echo "PRODUCT=$PRODUCT" >> $env:GITHUB_OUTPUT
+          env
+
+      - name: install inno.setup
+        shell: pwsh
+        run: |
+          choco install innosetup
+
+      - name: publish
+        shell: pwsh
+        run: |
+          dotnet publish ./src/SmartWorkStation.AutomationInspect.App/SmartWorkStation.AutomationInspect.App.csproj -p:Version=$env:VERSION -c $env:Configuration -r win-x64 -p:PublishSingleFile=true --self-contained -o ${{ github.workspace }}/publish/$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+      - name: create installer
+        shell: pwsh
+        run: |
+          cd ${{ github.workspace }}/publish/$env:Configuration
+          mkdir output
+          iscc.exe setup.iss
+          ls  ${{ github.workspace }}/publish/$env:Configuration/output
+          echo $env:VERSION
+          cd output
+          mv 斧工自动测试工作台.setup.x64.exe 斧工自动测试工作台.setup.x64-$env:VERSION.exe
+        env:
+          Configuration: ${{ matrix.configuration }}
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: setup
+          path: ${{ github.workspace }}\publish\${{ matrix.configuration }}\output\
+#   publish-aliyun:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: download artifact
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: setup
+#           path: output
+
+#       - uses: chf007/aliyun-oss-upload-action@main
+#         with:
+#           source-dir: 'output'
+#           dest-dir: '${{ needs.build.outputs.product }}'
+#           bucket: 'smart-work-station'
+#           region: 'oss-cn-shanghai'
+#         env:
+#           OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY }}
+#           OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_SECRET_KEY }}
+
+#   publish-minio:
+#     needs: build
+#     runs-on: windows-latest
+#     steps:
+#       - name: download artifact
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: setup
+#           path: output
+
+#       - name: Setup scoop
+#         # You may pin to the exact commit or the version.
+#         # uses: MinoruSekine/setup-scoop@6435f41324fa55988d8ce5b06bae5cafc75fe045
+#         uses: MinoruSekine/setup-scoop@v4
+
+#       # Install the mc command line tool of minio
+#       - name: Install Minio Client
+#         shell: pwsh
+#         run: |
+#           scoop install minio-client
+#           mc --version
+
+#       # upload the package to minio with mc
+#       - name: Upload to Minio
+#         shell: pwsh
+#         run: |
+#           echo "Uploading to Minio"
+#           mc alias set minio $env:MINIO_SERVER $env:MINIO_ACCESS_KEY $env:MINIO_SECRET_KEY
+#           mc cp output/斧工自动测试工作台.setup.x64-$env:VERSION_NUMBER.exe minio/smart-work-station/$env:PRODUCT_NAME/斧工自动测试工作台.setup.x64-$env:VERSION_NUMBER.exe
+#         env:
+#           MINIO_SERVER: ${{ secrets.MINIO_SERVER }}
+#           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+#           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+#           PRODUCT_NAME: ${{ needs.build.outputs.product }}
+#           VERSION_NUMBER: ${{ needs.build.outputs.version }}
