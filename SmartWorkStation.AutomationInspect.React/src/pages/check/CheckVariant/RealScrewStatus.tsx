@@ -10,7 +10,6 @@ import {
   syncTime,
   unlock,
 } from '../../../services/screw'
-import { fullifyUrl } from '../../../services/fetch'
 
 enum ScrewStatusEnum {
   Ready = 0,

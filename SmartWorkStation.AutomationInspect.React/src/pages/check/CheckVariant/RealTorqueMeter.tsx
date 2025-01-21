@@ -8,7 +8,6 @@ import {
   togglePeek,
   toggleUnit,
 } from '../../../services/meter'
-import { fullifyUrl } from '../../../services/fetch'
 
 const parseUnit = (unit: number) => {
   switch (unit) {

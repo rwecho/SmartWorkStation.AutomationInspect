@@ -1,29 +1,15 @@
-import {
-  Table,
-  Space,
-  Card,
-  Button,
-  Popconfirm,
-  Tabs,
-  message,
-  Statistic,
-} from 'antd'
-import ReactECharts from 'echarts-for-react'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { Space, Button, Popconfirm, Tabs, message, Statistic } from 'antd'
+import { useContext, useEffect, useState } from 'react'
 import { cancelChecking } from '../../../services/checking'
 import { StationContext } from '../../../hooks/useStationContext'
 import RealTorqueMeter from './RealTorqueMeter'
 import RealScrewStatus from './RealScrewStatus'
-import {
-  CheckingStatus,
-  PointItem,
-  useCheckingStore,
-} from '../../../stores/checkingStore'
+import { CheckingStatus } from '../../../stores/checkingStore'
 import Aging from './Aging'
 import CheckPoint from './CheckPoint'
-import { fullifyUrl } from '../../../services/fetch'
-import cloneDeep from 'lodash.clonedeep'
 import useCheckStatus from '../../../hooks/useCheckStatus'
+import ReactECharts from 'echarts-for-react'
+import cloneDeep from 'lodash.clonedeep'
 
 const CheckingChart = () => {
   const DEFAULT_OPTION = {
@@ -90,29 +76,8 @@ const CheckingChart = () => {
 
   const { station } = useContext(StationContext)
 
-  // const { pointItems, agingItems } = useCheckingStore()
-
-  // const last30Items = useMemo(() => {
-  //   return [...pointItems, ...agingItems].slice(-30)
-  // }, [pointItems, agingItems])
-
-  // useEffect(() => {
-  //   const newOption = cloneDeep(option) // immutable
-  //   const items = last30Items
-  //   debugger
-
-  //   const last30MeterTorques = last30Items.map((o) => o.MeterTorque)
-  //   const last30ScrewTorques = last30Items.map((o) => o.ScrewTorque)
-  //   // newOption.series[0].data = last30MeterTorques as never[]
-  //   // newOption.series[1].data = last30ScrewTorques as never[]
-  //   // newOption.xAxis[0].data = last30MeterTorques.map(
-  //   //   (_, index) => index + 1
-  //   // ) as never[]
-  //   // setOption(newOption)
-  // }, [last30Items])
-
   if (!station) {
-    return <>请选择工作站</>
+    return <div>未选择工作站</div>
   }
 
   const handleCancel = async () => {
@@ -124,13 +89,36 @@ const CheckingChart = () => {
       message.error('停止失败')
     }
   }
-  const { status, screwFactor, agingPoints, checkingPoints } = useCheckStatus(
-    station.id
-  )
+  const { status, realTorque, screwFactor, agingPoints, checkingPoints } =
+    useCheckStatus(station.id)
+
+  let count = 0
+  useEffect(() => {
+    const newOption = cloneDeep(option) // immutable
+    const data0 = newOption.series[0].data
+    const data1 = newOption.series[1].data
+    if (!realTorque) return
+    if (data0.length > 20) {
+      data0.shift()
+    }
+    const { screwTorque, meterTorque } = realTorque
+
+    data0.push(screwTorque as never)
+
+    if (data1.length > 20) {
+      data1.shift()
+    }
+    data1.push(meterTorque as never)
+
+    newOption.xAxis[0].data.shift()
+    newOption.xAxis[0].data.push(count++ as never)
+
+    setOption(newOption)
+  }, [realTorque])
 
   return (
     <Space direction='vertical' size='large' className='w-full '>
-      {/* <ReactECharts option={option} style={{ height: 400 }} /> */}
+      <ReactECharts option={option} style={{ height: 400 }} />
       <Space size={'large'} className='w-full justify-center my-8'>
         {screwFactor && (
           <>
@@ -173,7 +161,6 @@ const CheckingChart = () => {
 }
 
 const Checking = ({ status }: { status: CheckingStatus }) => {
-  const { station } = useContext(StationContext)
   let tabItems = [
     {
       key: '1',

@@ -148,7 +148,7 @@ public class StationConnection(Station station, CheckingService checkingService,
         }
         catch (TaskCanceledException)
         {
-            _checkingStatusStream.OnNext(Services.CheckingStatus.Idle);
+            _checkingStatusStream.OnNext(Services.CheckingStatus.Canceled);
             logger.LogInformation("点检任务取消");
         }
         catch (Exception exception)
@@ -175,8 +175,8 @@ public class StationConnection(Station station, CheckingService checkingService,
                  logger.LogInformation("获取到电批数据 {Record} ,{Value}", record?.Torque, value);
              })
              .Subscribe();
-        await StartScrewing(3.5, cancellationToken);
-        await StartReverseScrewing(2.5, cancellationToken);
+        await StartScrewing(station.ScrewingWaitTime, cancellationToken);
+        await StartReverseScrewing(station.ReverseScrewingWaitTime, cancellationToken);
         timeoutCts.Token.Register(() => tsc.TrySetCanceled());
         return await tsc.Task;
     }

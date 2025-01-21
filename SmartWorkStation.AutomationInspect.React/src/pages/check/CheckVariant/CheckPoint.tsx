@@ -14,17 +14,20 @@ const CheckPoint = () => {
 
   const columns = [
     {
-      title: '点测扭矩',
+      title: '点测扭矩(N.m)',
       dataIndex: 'Point',
       key: 'point',
     },
     {
-      title: '电批扭矩',
+      title: '电批扭矩(N.m)',
       dataIndex: 'ScrewTorque',
       key: 'screwTorque',
+      render: (torque: number) => {
+        return (torque / 100.0).toFixed(2)
+      },
     },
     {
-      title: '测量仪扭矩',
+      title: '测量仪扭矩(N.m)',
       dataIndex: 'MeterTorque',
       key: 'meterTorque',
     },
@@ -33,7 +36,11 @@ const CheckPoint = () => {
     <Card>
       <Table
         columns={columns}
-        dataSource={checkingPoints}
+        dataSource={checkingPoints.map((point, index) => ({
+          key: index,
+          ...point,
+        }))}
+        rowKey={(record) => record.key}
         pagination={{
           pageSize: 10,
         }}

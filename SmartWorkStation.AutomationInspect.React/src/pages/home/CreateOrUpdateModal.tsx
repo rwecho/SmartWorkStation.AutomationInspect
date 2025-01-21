@@ -45,6 +45,8 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
     duration: 60,
     times: 100,
     targetTorque: 1.8,
+    screwingWaitTime: 3.5,
+    reverseScrewingWaitTime: 2.5,
   }
   const [byDuration, setByDuration] = useState(initialValues.byDuration)
   const [form] = Form.useForm()
@@ -158,6 +160,23 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
           rules={[{ required: true, message: '请填写数据位' }]}
         >
           <InputNumber min={5} max={8} />
+        </Form.Item>
+      </Space>
+
+      <Space>
+        <Form.Item<Station>
+          label='正转等待时间'
+          name='screwingWaitTime'
+          rules={[{ required: true, message: '请输入合适的等待时间' }]}
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item<Station>
+          label='反拧等待时间'
+          name='reverseScrewingWaitTime'
+          rules={[{ required: true, message: '请输入合适的等待时间' }]}
+        >
+          <InputNumber />
         </Form.Item>
       </Space>
 

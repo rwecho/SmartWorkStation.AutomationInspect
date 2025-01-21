@@ -1,5 +1,5 @@
-import { create } from "zustand"
-import { getAsync, postAsync, putAsync, removeAsync } from "../services/fetch"
+import { create } from 'zustand'
+import { getAsync, postAsync, putAsync, removeAsync } from '../services/fetch'
 
 export interface Station {
   id: number
@@ -18,6 +18,8 @@ export interface Station {
   duration: number
   times: number
   targetTorque: number
+  screwingWaitTime: number
+  reverseScrewingWaitTime: number
 }
 
 interface StationStore {
@@ -33,17 +35,17 @@ export const useStationStore = create<StationStore>((set, get) => ({
   stations: [],
 
   load: async () => {
-    const stations = await getAsync<Station[]>("/api/stations")
+    const stations = await getAsync<Station[]>('/api/stations')
     set({ stations: stations })
   },
 
   add: async (station) => {
     const stations = get().stations
     if (stations.find((s: Station) => s.id === station.id)) {
-      throw new Error("工作站ID已存在")
+      throw new Error('工作站ID已存在')
     }
     stations.push(station)
-    await postAsync("/api/stations", {
+    await postAsync('/api/stations', {
       ...station,
       dataBits: 8,
     })
@@ -77,7 +79,7 @@ export const useStationStore = create<StationStore>((set, get) => ({
 
     const newStation = { ...station, id: newId }
     stations.push(newStation)
-    await postAsync("/api/stations", newStation)
+    await postAsync('/api/stations', newStation)
     set({ stations })
   },
 }))

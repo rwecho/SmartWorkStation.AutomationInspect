@@ -17,7 +17,7 @@ const StationCard = ({
       </Tag>
       <Tag color='cyan'>扭矩: {station.targetTorque} N.m</Tag>
       {station.checking && <Tag color='success'>自动校验</Tag>}
-      {station.byDuration && <Tag color='orange'>{station.duration} 小时</Tag>}
+      {station.byDuration && <Tag color='orange'>{station.duration} 分钟</Tag>}
     </Space>
   )
   return (

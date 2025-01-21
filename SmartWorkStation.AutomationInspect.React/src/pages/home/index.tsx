@@ -64,7 +64,7 @@ const HomePage = () => {
       key: 'durationOrTimes',
       render: (record) => {
         return record.byDuration ? (
-          <span>{record.duration} 小时</span>
+          <span>{record.duration} 分钟</span>
         ) : (
           <span>{record.times} 次</span>
         )
@@ -198,6 +198,7 @@ const HomePage = () => {
           <Table<Station>
             dataSource={stations}
             columns={columns}
+            rowKey={(record) => record.id}
             locale={{
               emptyText: <Empty description='暂无数据'></Empty>,
             }}

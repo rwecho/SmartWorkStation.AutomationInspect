@@ -38,7 +38,11 @@ const Aging = () => {
     <Card>
       <Table
         columns={columns}
-        dataSource={agingPoints}
+        dataSource={agingPoints.map((point, index) => ({
+          key: index,
+          ...point,
+        }))}
+        rowKey={(record) => record.key}
         pagination={{
           pageSize: 10,
         }}

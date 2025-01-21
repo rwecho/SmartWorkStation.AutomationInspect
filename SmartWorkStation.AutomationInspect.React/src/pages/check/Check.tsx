@@ -6,7 +6,7 @@ import Pending from './CheckVariant/Pending'
 import Checking from './CheckVariant/Checking'
 import useCheckStatus from '../../hooks/useCheckStatus'
 import { CheckingStatus } from '../../stores/checkingStore'
-import { Affix, Badge, Button, Card } from 'antd'
+import { Badge } from 'antd'
 
 const Check = ({ station }: { station?: Station }) => {
   if (!station) {

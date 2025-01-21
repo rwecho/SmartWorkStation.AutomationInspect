@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { fullifyUrl } from '../services/fetch'
 
 export enum CheckingStatus {
   idle = 0,
@@ -27,6 +26,6 @@ interface Checking {
   status: CheckingStatus
 }
 
-export const useCheckingStore = create<Checking>((set) => ({
+export const useCheckingStore = create<Checking>(() => ({
   status: CheckingStatus.idle,
 }))

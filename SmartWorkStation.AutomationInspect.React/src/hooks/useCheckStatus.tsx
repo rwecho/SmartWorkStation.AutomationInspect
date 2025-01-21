@@ -20,12 +20,18 @@ export interface ScrewFactor {
   b: number
 }
 
+export interface RealTorque {
+  screwTorque: number
+  meterTorque: number
+}
+
 const useCheckStatus = (id: number) => {
   const [status, setStatus] = useState<CheckingStatus>(CheckingStatus.idle)
   const [checkingPoints, setCheckingPoints] = useState<CheckPoint[]>([])
   const [agingPoints, setAgingPoints] = useState<AgingPoint[]>([])
   const [screwFactor, setScrewFactor] = useState<ScrewFactor | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [realTorque, setRealTorque] = useState<RealTorque | null>(null)
 
   useEffect(() => {
     const eventSource = new EventSource(
@@ -38,6 +44,11 @@ const useCheckStatus = (id: number) => {
     eventSource.addEventListener('checking', (event) => {
       const point = JSON.parse(event.data) as CheckPoint
       setCheckingPoints((prev) => [...prev, point])
+
+      setRealTorque({
+        screwTorque: point.screwTorque,
+        meterTorque: point.meterTorque,
+      })
     })
 
     eventSource.addEventListener('calibrated', (event) => {
@@ -48,6 +59,10 @@ const useCheckStatus = (id: number) => {
     eventSource.addEventListener('aging', (event) => {
       const point = JSON.parse(event.data) as AgingPoint
       setAgingPoints((prev) => [...prev, point])
+      setRealTorque({
+        screwTorque: point.screwTorque,
+        meterTorque: point.meterTorque,
+      })
     })
 
     eventSource.addEventListener('finished', () => {
@@ -66,6 +81,7 @@ const useCheckStatus = (id: number) => {
   return {
     status,
     error,
+    realTorque,
     checkingPoints,
     agingPoints,
     screwFactor,

@@ -1,4 +1,4 @@
-import { getAsync, postAsync } from './fetch'
+import { postAsync } from './fetch'
 
 export const startChecking = async (id: number) => {
   return await postAsync(`/api/checking/${id}/start`)

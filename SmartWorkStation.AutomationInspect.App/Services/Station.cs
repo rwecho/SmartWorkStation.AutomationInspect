@@ -87,4 +87,14 @@ public class Station
     /// </summary>
     public double TargetTorque { get; set; } = 0;
 
+    /// <summary>
+    /// 正转等待时间
+    /// </summary>
+    public double ScrewingWaitTime { get; set; } = 3.5;
+
+    /// <summary>
+    /// 反转等待时间
+    /// </summary>
+    public double ReverseScrewingWaitTime { get; set; } = 2.5;
+
 }
