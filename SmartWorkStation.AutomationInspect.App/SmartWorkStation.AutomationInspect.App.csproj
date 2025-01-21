@@ -45,7 +45,7 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\logo.png" ForegroundFile="Resources\AppIcon\logo.png" Color="#FF0000"  />
+        <MauiIcon Include="Resources\AppIcon\appicon.png" BaseSize="96,96" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -101,7 +101,7 @@
 	  <None Update="ChineseSimplified.isl">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\AppIcon\logo.png">
+	  <None Update="Resources\AppIcon\appicon.png">
 	    <PackagePath>\</PackagePath>
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	    <Pack>True</Pack>
