@@ -14,7 +14,7 @@ export const togglePeek = async (id: number) => {
 }
 
 export const toggleUnit = async (id: number) => {
-  await postAsync(`/api/merter/${id}/unit`, {})
+  await postAsync(`/api/meter/${id}/unit`, {})
 }
 
 export const reset = async (id: number) => {

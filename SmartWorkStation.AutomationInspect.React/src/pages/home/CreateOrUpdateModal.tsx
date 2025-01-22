@@ -37,7 +37,7 @@ const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
     com: 'COM3',
     baudRate: 19200,
     dataBits: 8,
-    parity: 1,
+    parity: 0,
     stopBits: 1,
     checking: true,
     checkingTimes: 10,

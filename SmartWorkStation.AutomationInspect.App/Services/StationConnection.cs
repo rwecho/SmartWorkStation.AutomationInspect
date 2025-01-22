@@ -47,6 +47,12 @@ public class StationConnection(Station station, CheckingService checkingService,
             logger.LogInformation("开始点检工位 {Station}", station.Name);
             _checkingStatusStream.OnNext(Services.CheckingStatus.Checking);
 
+            // 切换成峰值模式
+            if (_torqueMeterClient.InfoStream.Value?.Peek != Peek.Peak)
+            {
+                await SwitchPeek();
+            }
+
             var checkPointList = new List<CheckPointData>();
             // 开始点检
             foreach (var point in station.CheckingPoints)
