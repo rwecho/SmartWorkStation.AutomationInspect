@@ -4,7 +4,6 @@ import RealScrewStatus from './RealScrewStatus'
 import RealTorqueMeter from './RealTorqueMeter'
 import { useContext } from 'react'
 import { StationContext } from '../../../hooks/useStationContext'
-import useCheckStatus from '../../../hooks/useCheckStatus'
 
 const Finished = () => {
   const { station } = useContext(StationContext)
