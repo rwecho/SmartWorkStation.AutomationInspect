@@ -78,7 +78,7 @@
         <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
 		<PackageReference Include="SmartWorkStation.LibATF6000" Version="0.0.8" />
-		<!--<PackageReference Include="SmartWorkStation.LibTorqueMeter" Version="0.0.1" />-->
+		<PackageReference Include="SmartWorkStation.LibTorqueMeter" Version="0.0.1" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="Volo.Abp.AspNetCore" Version="9.0.3" />
         <PackageReference Include="Volo.Abp.Autofac" Version="9.0.3" />
@@ -88,12 +88,6 @@
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
 	</ItemGroup>
-
-
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\SmartWorkstation\sdks\SmartWorkStation.LibTorqueMeter\src\SmartWorkStation.LibTorqueMeter\SmartWorkStation.LibTorqueMeter.csproj" />
-    </ItemGroup>
 
 	<ItemGroup>
 	  <None Update="Assets\logo.ico">
