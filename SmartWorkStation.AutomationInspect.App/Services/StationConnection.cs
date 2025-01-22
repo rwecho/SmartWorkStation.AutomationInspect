@@ -86,18 +86,21 @@ public class StationConnection(Station station, CheckingService checkingService,
             double kp = 0;
             double b = 0;
             // 开始调整电批系数
-            if (checkPointList.Count != 0 && station.Checking)
+            if (checkPointList.Count != 0)
             {
                 (kp, b) = Calibrate(checkPointList);
                 logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
-                await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
+                if(station.Checking)
+                {
+                    await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
+                }
             }
             else
             {
                 logger.LogInformation("未获取到点检数据或未配置校准，跳过校准电批系数");
             }
-            _checkingStatusStream.OnNext(Services.CheckingStatus.Calibrated);
 
+            _checkingStatusStream.OnNext(Services.CheckingStatus.Calibrated);
             token.ThrowIfCancellationRequested();
 
             // 开始老化测试
@@ -228,7 +231,8 @@ public class StationConnection(Station station, CheckingService checkingService,
 
     public async Task SyncTime()
     {
-        var now = DateTime.Now;
+        // 增加2秒提前量
+        var now = DateTime.Now.AddSeconds(2);
         var year = now.Year;
         var month = now.Month;
         var day = now.Day;
