@@ -11,7 +11,6 @@ const Finished = () => {
   if (!station) {
     return <div>未选择工作站</div>
   }
-  const { error } = useCheckStatus(station.id)
   const handleReset = async () => {
     try {
       await finishChecking(station.id)
