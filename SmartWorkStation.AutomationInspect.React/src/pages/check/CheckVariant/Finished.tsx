@@ -27,7 +27,6 @@ const Finished = () => {
       <Alert message='校验已完成' type='success' showIcon></Alert>
 
       <div className='flex justify-center my-8'>
-        <Alert message={error} type='error' showIcon></Alert>
         <Button size='large' danger onClick={handleReset} className='w-64 h-16'>
           复位
         </Button>
