@@ -4,7 +4,8 @@
              xmlns:local="clr-namespace:SmartWorkStation.AutomationInspect.App"
              x:Class="SmartWorkStation.AutomationInspect.App.MainPage"
              xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
-            ios:Page.UseSafeArea="True">
+            ios:Page.UseSafeArea="True"
+             Title="hello">
     <Grid>
         <HybridWebView x:Name="hybridWebView" />
     </Grid>

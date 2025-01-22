@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -48,7 +47,14 @@ namespace SmartWorkStation.AutomationInspect.App
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            var window = new Window(new AppShell());
+            var window = new Window(new AppShell())
+            {
+                TitleBar = new TitleBar
+                {
+                    Title = "斧工自动测试工作台",
+                    Icon = "Assets/logo.png"
+                }
+            };
 
             window.Created += (sender, args) =>
             {

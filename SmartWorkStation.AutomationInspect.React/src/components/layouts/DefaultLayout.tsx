@@ -32,7 +32,9 @@ const DefaultLayout = () => {
           collapsed={collapsed}
         >
           {!collapsed && (
-            <div className='p-4 text-lg font-semibold py-6'>{AppName}</div>
+            <div className='px-4 text-lg font-semibold py-6'>
+              <img src='/logo.png' alt='logo' className='w-full h-10' />
+            </div>
           )}
 
           <Menu
