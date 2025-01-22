@@ -86,7 +86,7 @@ public class StationConnection(Station station, CheckingService checkingService,
             double kp = 0;
             double b = 0;
             // 开始调整电批系数
-            if (checkPointList.Count != 0)
+            if (checkPointList.Count != 0 && station.Checking)
             {
                 (kp, b) = Calibrate(checkPointList);
                 logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
@@ -94,7 +94,7 @@ public class StationConnection(Station station, CheckingService checkingService,
             }
             else
             {
-                logger.LogInformation("未获取到点检数据，跳过校准电批系数");
+                logger.LogInformation("未获取到点检数据或未配置校准，跳过校准电批系数");
             }
             _checkingStatusStream.OnNext(Services.CheckingStatus.Calibrated);
 
