@@ -10,7 +10,9 @@ using System.Reactive.Subjects;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
 
-public class StationConnection(Station station, CheckingService checkingService, ILogger<StationConnection> logger)
+public class StationConnection(Station station, 
+    CheckingService checkingService,
+    ILogger<StationConnection> logger)
 {
     private readonly ATF6000Client _atf6000Client = new(station.IP, station.Port);
 
@@ -81,7 +83,7 @@ public class StationConnection(Station station, CheckingService checkingService,
             }
 
             logger.LogInformation("点检完成");
-            _checkPointSteam.OnCompleted();
+            //_checkPointSteam.OnCompleted();
 
             double kp = 0;
             double b = 0;
@@ -92,7 +94,7 @@ public class StationConnection(Station station, CheckingService checkingService,
                 if(station.Checking)
                 {
                     logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
-                    await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
+                    await _atf6000Client.SetFactor((ushort)(kp * 1000), (short)(b * 1000));
                 }
             }
             else
@@ -141,7 +143,7 @@ public class StationConnection(Station station, CheckingService checkingService,
                 }
             }
             logger.LogInformation($"老化测试完成");
-            _agingDataStream.OnCompleted();
+            //_agingDataStream.OnCompleted();
             _checkingStatusStream.OnNext(Services.CheckingStatus.Finished);
 
             var checkReport = new CheckingReport
@@ -281,6 +283,9 @@ public class StationConnection(Station station, CheckingService checkingService,
             _checkingStatusStream.Value == Services.CheckingStatus.Canceled||
           _checkingStatusStream.Value == Services.CheckingStatus.Error)
         {
+            _agingDataStream.OnNext(null);
+            _checkPointSteam.OnNext(null);
+
             _checkingStatusStream.OnNext(Services.CheckingStatus.Idle);
         }
     }

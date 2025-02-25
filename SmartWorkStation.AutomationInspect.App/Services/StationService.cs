@@ -45,7 +45,7 @@ public class CheckingService : ITransientDependency
 }
 
 
-public class StationService : ITransientDependency
+public class StationService : ISingletonDependency
 {
     private List<Station> _stations = [];
     private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppData", "stations.json");

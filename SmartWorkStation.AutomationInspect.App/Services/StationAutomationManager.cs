@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Volo.Abp.DependencyInjection;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
@@ -79,7 +78,7 @@ public class StationAutomationManager(StationService stationService,
 
         var cts = new CancellationTokenSource();
         var task = Task.Run(() => connection.Checking(cts.Token), cts.Token);
-        _checkingTasks.TryAdd(id, new CheckingTask(task, cts));
+        _checkingTasks[id] = new CheckingTask(task, cts);
         return Task.CompletedTask;
     }
 
