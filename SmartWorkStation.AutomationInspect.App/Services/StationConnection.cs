@@ -89,9 +89,9 @@ public class StationConnection(Station station, CheckingService checkingService,
             if (checkPointList.Count != 0)
             {
                 (kp, b) = Calibrate(checkPointList);
-                logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
                 if(station.Checking)
                 {
+                    logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
                     await _atf6000Client.SetFactor((ushort)(kp * 100), (short)(b * 100));
                 }
             }
@@ -204,6 +204,12 @@ public class StationConnection(Station station, CheckingService checkingService,
             .Where(t => t != null)
             .Select(t => t!.Value/100.0)
             .ToArray();
+
+        if(points.Length != torques.Length)
+        {
+            throw new InvalidOperationException("Invalid calibrate data.");
+        }
+
         // 计算电批系数, 以points为x轴，torques为y轴, 用线性回归计算出kp 斜率和b 截距 ，MathNet.Numerics
         var (b, kp) = Fit.Line([.. points.Select(p => (double)p)], [.. torques]);
         return (kp, b);
