@@ -56,7 +56,7 @@ jobs:
       - name: publish
         shell: pwsh
         run: |
-          dotnet publish ./SmartWorkStation.AutomationInspect.App/SmartWorkStation.AutomationInspect.App.csproj -f net9.0-windows10.0.19041.0 -p:Version=$env:VERSION -c $env:Configuration -r win-x64 -o ${{ github.workspace }}/publish/$env:Configuration
+          dotnet publish ./SmartWorkStation.AutomationInspect.App/SmartWorkStation.AutomationInspect.App.csproj -f net9.0-windows10.0.19041.0 -p:Version=$env:VERSION -c $env:Configuration -r win-x64 --self-contained -o ${{ github.workspace }}/publish/$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
           VERSION: ${{ steps.get_version.outputs.VERSION }}
