@@ -10,7 +10,7 @@ using System.Reactive.Subjects;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
 
-public class StationConnection(Station station, 
+public class StationConnection(Station station,
     CheckingService checkingService,
     ILogger<StationConnection> logger)
 {
@@ -56,7 +56,13 @@ public class StationConnection(Station station,
             }
 
             var checkPointList = new List<CheckPointData>();
-            // 开始点检
+            logger.LogInformation("开始点检");
+            if (station.Checking)
+            {
+                // 将补偿重置。
+                await _atf6000Client.SetFactor((ushort)(1 * 1000), 0);
+                logger.LogInformation("重置电批系数");
+            }
             foreach (var point in station.CheckingPoints)
             {
                 Trace.WriteLine($"点检 {point}N.m");
@@ -91,7 +97,7 @@ public class StationConnection(Station station,
             if (checkPointList.Count != 0)
             {
                 (kp, b) = Calibrate(checkPointList);
-                if(station.Checking)
+                if (station.Checking)
                 {
                     logger.LogInformation("开始校准电批系数 kp:{Kp} b:{B}", kp, b);
                     await _atf6000Client.SetFactor((ushort)(kp * 1000), (short)(b * 1000));
@@ -107,6 +113,9 @@ public class StationConnection(Station station,
 
             // 开始老化测试
             _checkingStatusStream.OnNext(Services.CheckingStatus.Aging);
+
+            // 切换电批目标扭矩。
+            await SwitchTargetTorque(station.TargetTorque);
 
             var agingDataList = new List<AgingData>();
             if (station.ByDuration)
@@ -202,18 +211,24 @@ public class StationConnection(Station station,
     {
         var group = checkPointList.GroupBy(o => o.Point);
         var points = group.Select(o => o.Key).ToArray();
-        var torques = group.Select(o => o.Where(t => t.ScrewTorque != null).Select(p => p.ScrewTorque).Average())
+
+        // 计算扭力测量平均指
+        var torques = group.Select(o => o.Where(t => t.ScrewTorque != null)
+            .Select(p => p.MeterTorque).Average())
             .Where(t => t != null)
-            .Select(t => t!.Value/100.0)
+            .Select(t => t!.Value)
             .ToArray();
 
-        if(points.Length != torques.Length)
+        if (points.Length != torques.Length)
         {
             throw new InvalidOperationException("Invalid calibrate data.");
         }
 
-        // 计算电批系数, 以points为x轴，torques为y轴, 用线性回归计算出kp 斜率和b 截距 ，MathNet.Numerics
-        var (b, kp) = Fit.Line([.. points.Select(p => (double)p)], [.. torques]);
+        var targetTorque = points.Select(p => (double)p).ToArray();
+        var meterTorque = torques.Select(p => p).ToArray();
+
+        // 计算电批系数, 以扭力测量仪为x轴，目标扭矩为y轴, 用线性回归计算出kp斜率和b截距
+        var (b, kp) = Fit.Line(meterTorque, targetTorque);
         return (kp, b);
     }
 
@@ -280,7 +295,7 @@ public class StationConnection(Station station,
     public void Finish()
     {
         if (_checkingStatusStream.Value == Services.CheckingStatus.Finished ||
-            _checkingStatusStream.Value == Services.CheckingStatus.Canceled||
+            _checkingStatusStream.Value == Services.CheckingStatus.Canceled ||
           _checkingStatusStream.Value == Services.CheckingStatus.Error)
         {
             _agingDataStream.OnNext(null);
