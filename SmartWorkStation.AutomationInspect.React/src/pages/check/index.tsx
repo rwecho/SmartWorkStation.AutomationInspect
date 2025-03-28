@@ -1,33 +1,38 @@
-import { Layout, Space, theme } from 'antd'
-import { useStationStore } from '../../stores/stationStore'
-import StationCard from './StationCard'
-import { useEffect, useState } from 'react'
-import Check from './Check'
+import { Layout, Space, theme } from "antd";
+import { useStationStore } from "../../stores/stationStore";
+import StationCard from "./StationCard";
+import { useEffect, useState } from "react";
+import Check from "./Check";
 
 const CheckPage = () => {
-  const { stations, load } = useStationStore()
+  const { stations, load } = useStationStore();
 
-  const [selectedId, setSelectedId] = useState<number>(
-    stations.length > 0 ? stations[0].id : 0
-  )
+  const [selectedId, setSelectedId] = useState<number>();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    load()
-  }, [load])
+    if (stations.length > 0) {
+      setSelectedId(stations[0].id);
+    }
+  }, [stations]);
+
+  useEffect(() => {
+    load();
+  }, [load, stations]);
 
   const {
     token: { colorBgContainer },
-  } = theme.useToken()
+  } = theme.useToken();
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Layout.Content
         style={{
           background: colorBgContainer,
         }}
-        className='mx-1 rounded-md p-4'
+        className="mx-1 rounded-md p-4"
       >
         {!selectedId && (
-          <div className='text-center text-2xl'>请选择工作站</div>
+          <div className="text-center text-2xl">请选择工作站</div>
         )}
 
         {selectedId && (
@@ -36,22 +41,29 @@ const CheckPage = () => {
       </Layout.Content>
       <Layout.Sider
         width={200}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
         style={{ background: colorBgContainer }}
-        className='rounded-md p-4'
+        className="rounded-md"
+        theme="light"
       >
-        {/* Sidebar content */}
-        <Space direction='vertical' className='w-full'>
+        <Space
+          direction="vertical"
+          className={`w-full py-2 ${collapsed ? "px-1 " : "p-4"}`}
+        >
           {stations.map((station) => (
             <StationCard
               key={station.id}
               station={station}
               onClick={() => setSelectedId(station.id)}
               selected={selectedId === station.id}
+              small={collapsed}
             ></StationCard>
           ))}
         </Space>
       </Layout.Sider>
     </Layout>
-  )
-}
-export default CheckPage
+  );
+};
+export default CheckPage;

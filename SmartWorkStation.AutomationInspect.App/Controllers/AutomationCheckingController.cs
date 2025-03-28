@@ -48,7 +48,7 @@ public class AutomationCheckingController(StationAutomationManager automationMan
                     case CheckingStatus.Idle:
                         break;
                     case CheckingStatus.Checking:
-                        disposables.Add(stationConnection.CheckPointSteam
+                        disposables.Add(stationConnection.CheckPointsSteam
                             .Select(item => Observable.FromAsync(async () =>
                             {
                                 if (item == null) return;
@@ -80,7 +80,7 @@ public class AutomationCheckingController(StationAutomationManager automationMan
                         break;
                     case CheckingStatus.Aging:
                         {
-                            disposables.Add(stationConnection.AgingStream
+                            disposables.Add(stationConnection.AgingPointsStream
                                 .Select(item => Observable.FromAsync(async () =>
                                 {
                                     if (item == null) return;

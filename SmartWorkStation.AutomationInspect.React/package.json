@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
     "antd": "^5.23.1",
+    "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "react": "^18.3.1",

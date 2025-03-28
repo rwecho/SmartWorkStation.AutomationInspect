@@ -10,6 +10,7 @@ using System.Reactive.Subjects;
 
 namespace SmartWorkStation.AutomationInspect.App.Services;
 
+
 public class StationConnection(Station station,
     CheckingService checkingService,
     ILogger<StationConnection> logger)
@@ -28,11 +29,11 @@ public class StationConnection(Station station,
     private readonly BehaviorSubject<CheckingStatus> _checkingStatusStream = new(Services.CheckingStatus.Idle);
     public IObservable<CheckingStatus> CheckingStatus => _checkingStatusStream;
 
-    private readonly BehaviorSubject<CheckPointData?> _checkPointSteam = new(null);
-    public IObservable<CheckPointData?> CheckPointSteam => _checkPointSteam;
+    private readonly BehaviorSubject<IReadOnlyList<CheckPointData>> _checkPointsSteam = new([]);
+    public IObservable<IReadOnlyList<CheckPointData>> CheckPointsSteam => _checkPointsSteam;
 
-    private readonly BehaviorSubject<AgingData?> _agingDataStream = new(null);
-    public IObservable<AgingData?> AgingStream => _agingDataStream;
+    private readonly BehaviorSubject<IReadOnlyList<AgingData>> _agingPointsStream = new([]);
+    public IObservable<IReadOnlyList<AgingData>> AgingPointsStream => _agingPointsStream;
 
     public string? Error { get; private set; }
 
@@ -42,6 +43,7 @@ public class StationConnection(Station station,
     {
         try
         {
+            var startCheckingTime = DateTime.Now;
             if (_checkingStatusStream.Value != Services.CheckingStatus.Idle)
             {
                 throw new InvalidOperationException("当前工位正在进行其他操作");
@@ -83,8 +85,8 @@ public class StationConnection(Station station,
                         item.Item2
                     );
                     Trace.WriteLine($"点检数据 {checkPointData}");
-                    _checkPointSteam.OnNext(checkPointData);
                     checkPointList.Add(checkPointData);
+                    _checkPointsSteam.OnNext(checkPointList);
                 }
             }
 
@@ -131,8 +133,8 @@ public class StationConnection(Station station,
                     var item = await AutoRun(token);
                     var data = new AgingData(count, item.Item1?.Torque, item.Item2);
                     logger.LogInformation("老化测试数据 {Data}", data);
-                    _agingDataStream.OnNext(data);
                     agingDataList.Add(data);
+                    _agingPointsStream.OnNext(agingDataList);
                     count++;
                     logger.LogInformation("剩余时间 {Time}", TimeSpan.FromMinutes(station.Duration) - (DateTime.Now - startTime));
                 }
@@ -147,8 +149,8 @@ public class StationConnection(Station station,
                     var item = await AutoRun(token);
                     var data = new AgingData(i, item.Item1?.Torque, item.Item2);
                     logger.LogInformation("老化测试数据 {Data}", data);
-                    _agingDataStream.OnNext(data);
                     agingDataList.Add(data);
+                    _agingPointsStream.OnNext(agingDataList);
                 }
             }
             logger.LogInformation($"老化测试完成");
@@ -158,7 +160,7 @@ public class StationConnection(Station station,
             var checkReport = new CheckingReport
             {
                 Id = station.Id,
-                StartTime = DateTime.Now,
+                StartTime = startCheckingTime,
                 EndTime = DateTime.Now,
                 Name = station.Name,
                 Kp = kp,
@@ -298,8 +300,8 @@ public class StationConnection(Station station,
             _checkingStatusStream.Value == Services.CheckingStatus.Canceled ||
           _checkingStatusStream.Value == Services.CheckingStatus.Error)
         {
-            _agingDataStream.OnNext(null);
-            _checkPointSteam.OnNext(null);
+            _agingPointsStream.OnNext(null);
+            _checkPointsSteam.OnNext(null);
 
             _checkingStatusStream.OnNext(Services.CheckingStatus.Idle);
         }
