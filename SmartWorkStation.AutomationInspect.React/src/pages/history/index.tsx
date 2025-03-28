@@ -1,13 +1,4 @@
-import {
-  Button,
-  Card,
-  DatePicker,
-  Space,
-  Table,
-  message,
-  Input,
-  Tabs,
-} from "antd";
+import { Button, Card, DatePicker, Table, message, Input, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import type { CheckRecord } from "../../types/checkRecord";

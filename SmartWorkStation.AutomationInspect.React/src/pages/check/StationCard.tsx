@@ -1,4 +1,4 @@
-import { Avatar, Card, Space, Tag, Tooltip } from "antd";
+import { Card, Space, Tag, Tooltip } from "antd";
 import { Station } from "../../stores/stationStore";
 
 interface Props {
