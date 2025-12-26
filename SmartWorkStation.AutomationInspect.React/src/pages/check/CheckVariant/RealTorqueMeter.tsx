@@ -8,6 +8,7 @@ import {
   togglePeek,
   toggleUnit,
 } from "../../../services/meter";
+import { useShallow } from "zustand/shallow";
 
 const parseUnit = (unit: number) => {
   switch (unit) {
@@ -40,14 +41,16 @@ const RealTorqueMeter = ({
   id: number;
   readonly: boolean;
 }) => {
-  const { info, value, setValue, setInfo } = useMeterStore((state) => {
-    return {
-      info: state.info,
-      value: state.value,
-      setValue: state.setValue,
-      setInfo: state.setInfo,
-    };
-  });
+  const { info, value, setValue, setInfo } = useMeterStore(
+    useShallow((state) => {
+      return {
+        info: state.info,
+        value: state.value,
+        setValue: state.setValue,
+        setInfo: state.setInfo,
+      };
+    })
+  );
 
   useEffect(() => {
     const interval = setInterval(async () => {

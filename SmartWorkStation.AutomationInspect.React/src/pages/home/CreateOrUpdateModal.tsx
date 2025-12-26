@@ -13,13 +13,14 @@ import { Station, useStationStore } from "../../stores/stationStore";
 import { useContext, useState } from "react";
 import { ModalContext } from "../../hooks/useModal";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { useShallow } from "zustand/shallow";
 
 type CreateOrUpdateModalProps = {
   station?: Station;
   // onFinished?: (values: Station) => void
 };
 const CreateOrUpdateModal = (props: CreateOrUpdateModalProps) => {
-  const stations = useStationStore((state) => state.stations);
+  const stations = useStationStore(useShallow((state) => state.stations));
 
   // get the max id of the stations and add 1
   const initialStationId =

@@ -6,11 +6,12 @@ import { StationContext } from "../../../hooks/useStationContext";
 import RealScrewStatus from "./RealScrewStatus";
 import RealTorqueMeter from "./RealTorqueMeter";
 import { startChecking } from "../../../services/checking";
+import { useShallow } from "zustand/shallow";
 
 const Pending = () => {
   const { station } = useContext(StationContext);
 
-  const value = useMeterStore((state) => state.value);
+  const value = useMeterStore(useShallow((state) => state.value));
   const { screwStatus } = useScrewStore();
 
   if (station == null) {
