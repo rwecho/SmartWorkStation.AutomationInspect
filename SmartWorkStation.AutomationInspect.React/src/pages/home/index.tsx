@@ -16,9 +16,19 @@ import ButtonGroup from "antd/es/button/button-group";
 import CreateOrUpdateModal from "./CreateOrUpdateModal";
 import { useModal } from "../../hooks/useModal";
 import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { useShallow } from "zustand/shallow";
 
 const HomePage = () => {
-  const { stations, load, add, remove, update, copy } = useStationStore();
+  const { stations, load, add, remove, update, copy } = useStationStore(
+    useShallow((state) => ({
+      stations: state.stations,
+      load: state.load,
+      add: state.add,
+      remove: state.remove,
+      update: state.update,
+      copy: state.copy,
+    }))
+  );
   const { message } = App.useApp();
 
   console.log("stations:", stations);
@@ -166,8 +176,8 @@ const HomePage = () => {
     try {
       await add(result as Station);
       message.success("添加成功");
-    } catch (e: any) {
-      message.error(`添加失败: ${e.message}`);
+    } catch (e: unknown) {
+      message.error(`添加失败: ${(e as Error).message}`);
     }
   };
 
