@@ -3,9 +3,14 @@ import { useStationStore } from "../../stores/stationStore";
 import StationCard from "./StationCard";
 import { useEffect, useState } from "react";
 import Check from "./Check";
+import { useShallow } from "zustand/shallow";
 
 const CheckPage = () => {
-  const { stations, load } = useStationStore();
+  const { stations, load } = useStationStore(
+    useShallow((state) => {
+      return { stations: state.stations, load: state.load };
+    })
+  );
 
   const [selectedId, setSelectedId] = useState<number>();
   const [collapsed, setCollapsed] = useState(false);
@@ -18,7 +23,7 @@ const CheckPage = () => {
 
   useEffect(() => {
     load();
-  }, [load, stations]);
+  }, [load]);
 
   const {
     token: { colorBgContainer },
@@ -56,7 +61,9 @@ const CheckPage = () => {
             <StationCard
               key={station.id}
               station={station}
-              onClick={() => setSelectedId(station.id)}
+              onClick={() => {
+                setSelectedId(station.id);
+              }}
               selected={selectedId === station.id}
               small={collapsed}
             ></StationCard>
