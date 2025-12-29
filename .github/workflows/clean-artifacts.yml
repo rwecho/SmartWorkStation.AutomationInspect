@@ -1,0 +1,29 @@
+name: Clean Old Artifacts
+
+on:
+  # 每周日凌晨 2 点运行
+  schedule:
+    - cron: '0 2 * * 0'
+  # 允许手动触发
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Delete artifacts older than (days)'
+        required: true
+        default: '30'
+        type: string
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    
+    steps:
+      - name: Delete old artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: ${{ github.event.inputs.days || '30' }} # 默认删除 30 天前的 artifacts
+          skip-tags: true
+          skip-recent: 5 # 保留最近 5 个 artifacts
