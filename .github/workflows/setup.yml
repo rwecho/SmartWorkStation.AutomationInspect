@@ -33,6 +33,24 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      # Setup Node.js and pnpm for React build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Build React App
+        shell: pwsh
+        run: |
+          cd SmartWorkStation.AutomationInspect.React
+          pnpm install
+          pnpm build2app
+
       - name: Prepare release version
         id: get_version
         shell: pwsh
@@ -81,25 +99,26 @@ jobs:
         with:
           name: setup
           path: ${{ github.workspace }}\publish\${{ matrix.configuration }}\output\
-  #   publish-aliyun:
-  #     needs: build
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #       - name: download artifact
-  #         uses: actions/download-artifact@v4
-  #         with:
-  #           name: setup
-  #           path: output
 
-  #       - uses: chf007/aliyun-oss-upload-action@main
-  #         with:
-  #           source-dir: 'output'
-  #           dest-dir: '${{ needs.build.outputs.product }}'
-  #           bucket: 'smart-work-station'
-  #           region: 'oss-cn-shanghai'
-  #         env:
-  #           OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY }}
-  #           OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_SECRET_KEY }}
+  publish-aliyun:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: setup
+          path: output
+
+      - uses: chf007/aliyun-oss-upload-action@main
+        with:
+          source-dir: 'output'
+          dest-dir: '${{ needs.build.outputs.product }}'
+          bucket: 'smart-work-station'
+          region: 'oss-cn-shanghai'
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_SECRET_KEY }}
 
   publish-minio:
     needs: build
